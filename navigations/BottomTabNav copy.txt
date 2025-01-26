@@ -1,0 +1,127 @@
+import React from "react";
+import { View, Text } from "react-native";
+import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
+import Feather from "react-native-vector-icons/Feather";
+import { MaterialCommunityIcons, FontAwesome5, MaterialIcons, Ionicons } from "@expo/vector-icons";
+import { COLORS } from "../constants";
+import { Create, Home, Meals, Profile, Settings, MealPlanner } from "../screens";
+
+const Tab = createBottomTabNavigator();
+
+const screenOptions = {
+  tabBarShowLabel: true,
+  headerShown: false,
+  tabBarHideOnKeyboard: true,
+  tabBarStyle: {
+    position: "absolute",
+    bottom: 15,
+    right: 0,
+    left: 0,
+    elevation: 0,
+    height: 79,
+    backgroundColor: COLORS.white,
+    borderRadius: 15,
+    marginHorizontal: 10,
+    paddingBottom: 5,
+  },
+  tabBarLabelStyle: {
+    fontSize: 12,
+    marginTop: -5,
+  },
+};
+
+// Helper function to render icons and labels
+const renderTabBarIcon = (IconComponent, iconName, size, focused) => (
+  <View style={{ alignItems: "center", justifyContent: "center", height: "100%" }}>
+    <IconComponent
+      name={iconName}
+      size={size}
+      color={COLORS.icon_color}
+      style={{
+        position: "absolute",
+        top: 10,
+      }}
+    />
+  </View>
+);
+
+const renderTabBarLabel = (label, focused) => (
+  <View>
+    <Text
+      style={{
+        color: focused ? COLORS.primary : COLORS.black,
+        fontSize: 10,
+        top: 11,
+        marginLeft: 7,
+      }}
+    >
+      {label}
+    </Text>
+    {focused && (
+      <View
+        style={{
+          width: 40,
+          height: 3,
+          backgroundColor: "#b4ddff",
+          marginTop: 4,
+          borderRadius: 1,
+          marginLeft: 1,
+          top: 8,
+        }}
+      />
+    )}
+  </View>
+);
+
+const BottomTabNav = () => {
+  return (
+    <Tab.Navigator screenOptions={screenOptions}>
+      <Tab.Screen
+        name="Home"
+        component={Home}
+        options={{
+          tabBarIcon: ({ focused }) => renderTabBarIcon(Feather, "home", 30, focused),
+          tabBarLabel: ({ focused }) => renderTabBarLabel("Home", focused),
+        }}
+      />
+      <Tab.Screen
+        name="Meals"
+        component={Meals}
+        options={{
+          tabBarIcon: ({ focused }) =>
+            renderTabBarIcon(MaterialCommunityIcons, "food-fork-drink", 28, focused),
+          tabBarLabel: ({ focused }) => renderTabBarLabel("Meals", focused),
+        }}
+      />
+      <Tab.Screen
+        name="Create"
+        component={Create}
+        options={{
+          tabBarIcon: ({ focused }) =>
+            renderTabBarIcon(FontAwesome5, "running", 28, focused),
+          tabBarLabel: ({ focused }) => renderTabBarLabel("Create", focused),
+        }}
+      />
+      <Tab.Screen
+        name="Desserts"
+        component={Settings}
+        options={{
+          tabBarIcon: ({ focused }) =>
+            renderTabBarIcon(MaterialCommunityIcons, "cupcake", 28, focused),
+          tabBarLabel: ({ focused }) => renderTabBarLabel("Desserts", focused),
+        }}
+      />
+      <Tab.Screen
+        name="Analytics"
+        component={Profile}
+        options={{
+          tabBarIcon: ({ focused }) =>
+            renderTabBarIcon(MaterialIcons, "bar-chart", 28, focused),
+          tabBarLabel: ({ focused }) => renderTabBarLabel("Analytics", focused),
+        }}
+      />
+    </Tab.Navigator>
+  );
+};
+
+export default BottomTabNav;

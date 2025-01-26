@@ -1,0 +1,161 @@
+import React from 'react';
+import { View, Text, StyleSheet, ScrollView, TouchableOpacity } from 'react-native';
+import Icon from 'react-native-vector-icons/MaterialIcons';
+
+const Home = () => {
+  return (
+    <ScrollView style={styles.container}>
+      {/* Header */}
+      <View style={styles.header}>
+        <View style={styles.profileIcon}>
+          <Icon name="person" size={24} color="#fff" />
+        </View>
+        <Text style={styles.greeting}>Good Evening</Text>
+        <Text style={styles.date}>Monday 10th 2020</Text>
+        <View style={styles.headerIcons}>
+          <Icon name="notifications-none" size={24} color="#333" style={styles.icon} />
+          <Icon name="settings" size={24} color="#333" />
+        </View>
+      </View>
+
+      {/* Tip Section */}
+      <View style={styles.card}>
+        <Text style={styles.cardText}>
+          Drinking at least 1.5 to 2 liters of water a day helps flush toxins from your body
+        </Text>
+      </View>
+
+      {/* Checkup Section */}
+      <View style={styles.card}>
+        <Text style={styles.cardTitle}>7 Days Till Next Checkup</Text>
+        <Text style={styles.cardDetail}>17th Nov - Clinic at Hospital</Text>
+        <Text style={styles.cardDetail}>24th Nov - Blood test Date</Text>
+        <Text style={styles.cardDetail}>31st Nov - Doctor Meetup</Text>
+        <TouchableOpacity style={styles.addButton}>
+          <Icon name="add" size={20} color="#fff" />
+        </TouchableOpacity>
+      </View>
+
+      {/* Calories Section */}
+      <View style={[styles.card, styles.yellowCard]}>
+        <Text style={styles.cardTitle}>You Burned</Text>
+        <Text style={styles.calories}>128 cal / 40 min</Text>
+      </View>
+
+      {/* Sugar Level Section */}
+      <View style={[styles.card, styles.greenCard]}>
+        <Text style={styles.sugarLevel}>90</Text>
+        <Text style={styles.cardTitle}>Sugar Level</Text>
+        <Text style={styles.cardDetail}>Breakfast</Text>
+      </View>
+
+      {/* Meal Planner Section */}
+      <View style={styles.card}>
+        <Text style={styles.cardTitle}>Plan Your Meals</Text>
+        <Text style={styles.cardDetail}>Find the healthiest meal for you!</Text>
+        <TouchableOpacity>
+          <Text style={styles.linkText}>Try Meal Planner</Text>
+        </TouchableOpacity>
+      </View>
+    </ScrollView>
+  );
+};
+
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+    backgroundColor: '#f5f5f5',
+    padding: 20,
+  },
+  header: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    marginBottom: 20,
+  },
+  profileIcon: {
+    width: 40,
+    height: 40,
+    borderRadius: 20,
+    backgroundColor: '#333',
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  greeting: {
+    fontSize: 24,
+    fontWeight: 'bold',
+    color: '#333',
+    flex: 1,
+    marginLeft: 10,
+  },
+  date: {
+    fontSize: 14,
+    color: '#666',
+  },
+  headerIcons: {
+    flexDirection: 'row',
+    alignItems: 'center',
+  },
+  icon: {
+    marginRight: 15,
+  },
+  card: {
+    backgroundColor: '#fff',
+    padding: 15,
+    borderRadius: 10,
+    marginBottom: 15,
+    shadowColor: '#000',
+    shadowOpacity: 0.1,
+    shadowRadius: 8,
+    shadowOffset: { width: 0, height: 2 },
+    elevation: 3,
+  },
+  cardText: {
+    fontSize: 16,
+    color: '#555',
+  },
+  cardTitle: {
+    fontSize: 18,
+    fontWeight: 'bold',
+    marginBottom: 10,
+  },
+  cardDetail: {
+    fontSize: 14,
+    color: '#777',
+  },
+  addButton: {
+    backgroundColor: '#007bff',
+    width: 40,
+    height: 40,
+    borderRadius: 20,
+    justifyContent: 'center',
+    alignItems: 'center',
+    alignSelf: 'flex-start',
+    marginTop: 10,
+  },
+  yellowCard: {
+    backgroundColor: '#fff9c4',
+  },
+  greenCard: {
+    backgroundColor: '#e8f5e9',
+    alignItems: 'center',
+  },
+  sugarLevel: {
+    fontSize: 24,
+    fontWeight: 'bold',
+    color: '#388e3c',
+  },
+  calories: {
+    fontSize: 24,
+    fontWeight: 'bold',
+    color: '#f57f17',
+  },
+  linkText: {
+    fontSize: 14,
+    color: '#007bff',
+    textDecorationLine: 'underline',
+    marginTop: 5,
+  },
+});
+
+export default Home;
