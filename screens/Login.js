@@ -10,22 +10,42 @@ import {
     Modal,
 } from 'react-native';
 import { Feather } from '@expo/vector-icons';
+import ApiServer from './../Services/ApiServer';
 
 function Login({ navigation }) {
+
     const [formData, setFormData] = useState({
         email: '',
         password: '',
         resetEmail: '',
     });
+
     const [showPassword, setShowPassword] = useState(false);
     const [modalVisible, setModalVisible] = useState(false);
     const [resetEmail, setResetEmail] = useState('');
 
     const handleResetPassword = () => {
         navigation.navigate('ResetPassword')
-        // console.log('Reset Email:', resetEmail);
-        // setModalVisible(false); // Close the modal after handling the email submission
     };
+
+    const login = () => {
+        const endpoint = '/api/auth/login';
+
+        const body = {
+            username: formData.email,
+            password: formData.password,
+        }
+
+        ApiServer.call(endpoint, 'POST', body)
+            .then(data => {
+                if (data.message == "Login successful") {
+                    navigation.navigate('BottomTabNavigation');
+                }
+            })
+            .catch(error => {
+                console.error('Login failed:', error);
+            });
+    }
 
     return (
         <SafeAreaView style={styles.container}>
@@ -35,12 +55,12 @@ function Login({ navigation }) {
 
                     {/* Email Input */}
                     <View style={styles.inputContainer}>
-                        <Text style={styles.label}>E-mail</Text>
+                        <Text style={styles.label}>Username</Text>
                         <View style={styles.inputWrapper2}>
                             <Feather name="mail" size={20} color="#666" style={styles.icon} />
                             <TextInput
                                 style={styles.input}
-                                placeholder="Enter your e-mail here"
+                                placeholder="Enter your username here"
                                 keyboardType="email-address"
                                 value={formData.email}
                                 onChangeText={(text) => setFormData({ ...formData, email: text })}
@@ -72,7 +92,7 @@ function Login({ navigation }) {
 
                     {/* Log In Button */}
                     <TouchableOpacity
-                        onPress={() => navigation.navigate('BottomTabNavigation')}
+                        onPress={() => login()}
                         style={styles.loginInButton}>
                         <Text style={styles.loginInText}>Log In</Text>
                     </TouchableOpacity>
@@ -110,7 +130,7 @@ function Login({ navigation }) {
                 <View style={styles.modalOverlay}>
                     <View style={styles.modalContainer}>
                         <Text style={styles.modalTitle}>Reset Password</Text>
-                        
+
                         <View style={styles.inputWrapper3}>
                             <Feather name="mail" size={20} color="#666" style={styles.icon} />
                             <TextInput

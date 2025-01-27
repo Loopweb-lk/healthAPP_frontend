@@ -11,8 +11,8 @@ import {
   Ionicons
 } from "@expo/vector-icons";
 
-function Home({ navigation }) { 
-  
+function Home({ navigation }) {
+
   const [showSettings, setShowSettings] = useState(false);
   const [selectedTime, setSelectedTime] = useState(new Date());
 
@@ -55,7 +55,7 @@ function Home({ navigation }) {
       <TouchableOpacity style={styles.settingsItem}>
         <Text style={styles.settingsText}>Change Password</Text>
       </TouchableOpacity>
-      <TouchableOpacity style={styles.settingsItem}>
+      <TouchableOpacity style={styles.settingsItem} onPress={() => { navigation.navigate('Login'); setShowSettings(!showSettings) }}>
         <Text style={styles.settingsText}>Log Out</Text>
       </TouchableOpacity>
     </View>

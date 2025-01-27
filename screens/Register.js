@@ -11,12 +11,13 @@ import {
 import { Feather } from '@expo/vector-icons';
 import { createStackNavigator } from '@react-navigation/stack';
 import { NavigationContainer } from '@react-navigation/native';
-import { createStaticNavigation, useNavigation,} from '@react-navigation/native';
+import { createStaticNavigation, useNavigation, } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import Welcome from '../Welcome';  // Adjust path as needed
 import Login from './Login';
+import ApiServer from './../Services/ApiServer';
 
-function Register({ navigation }) {    
+function Register({ navigation }) {
 
     const [formData, setFormData] = useState({
         fullName: '',
@@ -35,9 +36,25 @@ function Register({ navigation }) {
         return conditions;
     };
 
-    // const InsertRecord = () => {
-    //     navigation.navigate(Stack);
-    // };
+    const register = () => {
+        const endpoint = '/api/auth/register';
+
+        const body = {
+            username: formData.fullName,
+            email: formData.email,
+            password: formData.password,
+        }
+
+        ApiServer.call(endpoint, 'POST', body)
+            .then(data => {
+                if (data.message == "User registered successfully") {
+                    navigation.navigate('BottomTabNavigation');
+                }
+            })
+            .catch(error => {
+                console.error('Register failed:', error);
+            });
+    }
 
     return (
         <SafeAreaView style={styles.container}>
@@ -128,12 +145,15 @@ function Register({ navigation }) {
 
                     {/* Sign Up Button */}
                     <TouchableOpacity
+                        onPress={() => register()}
                         style={[styles.signUpButton,
                         { opacity: acceptedTerms ? 1 : 0.5 }]}
                         disabled={!acceptedTerms}
                     >
                         <Text style={styles.signUpText}>Sign Up</Text>
                     </TouchableOpacity>
+
+
                     <View style={{ flexDirection: 'row', alignItems: 'center', marginBottom: 10, marginTop: -10 }}>
                         <View
                             style={{
