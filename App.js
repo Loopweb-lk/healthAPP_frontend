@@ -15,6 +15,7 @@ import ResetPassword from './screens/Resetpassword';
 import EmergencyContacts from './screens/EmergencyContacts';
 import MealPlanner from './screens/MealPlanner';
 import EnterMealItems from './screens/EnterMealItems';
+import RecordMeal from './screens/RecordMeal';
 
 // Prevent SplashScreen from auto-hiding until ready
 SplashScreen.preventAutoHideAsync();
@@ -79,14 +80,16 @@ export default function App() {
           <>
             <Stack.Screen name="Login" component={Login} />
             <Stack.Screen name="BottomTabNavigation" component={BottomTabNav} />
+            <Stack.Screen name="Register" component={Register} />
+            <Stack.Screen name="ResetPassword" component={ResetPassword} />
+            <Stack.Screen name="EmergencyContacts" component={EmergencyContacts} />
+            <Stack.Screen name="MealPlanner" component={MealPlanner} />
+            <Stack.Screen name="EnterMealItems" component={EnterMealItems} />
+            <Stack.Screen name="EditProfile" component={EditProfile} />
+            <Stack.Screen name="RecordMeal" component={RecordMeal} />
           </>
         )}
-        <Stack.Screen name="Register" component={Register} />
-        <Stack.Screen name="ResetPassword" component={ResetPassword} />
-        <Stack.Screen name="EmergencyContacts" component={EmergencyContacts} />
-        <Stack.Screen name="MealPlanner" component={MealPlanner} />
-        <Stack.Screen name="EnterMealItems" component={EnterMealItems} />
-        <Stack.Screen name="EditProfile" component={EditProfile} />
+        
       </Stack.Navigator>
     </NavigationContainer>
   );

@@ -90,7 +90,7 @@ function MealPlanner({ navigation }) {
                     <Ionicons name="restaurant-outline" size={24} color="#666" />
                     <Text style={styles.navText}>Meals</Text>
                 </TouchableOpacity>
-                <TouchableOpacity style={styles.navItem} onPress={() => navigation.navigate('MealPlanner')}>
+                <TouchableOpacity style={styles.navItem}>
                     <Ionicons name="fitness-outline" size={24} color="#666" />
                     <Text style={styles.navText}>Create</Text>
                 </TouchableOpacity>

@@ -11,7 +11,8 @@ import {
   Ionicons
 } from "@expo/vector-icons";
 
-const Home = () => {
+function Home({ navigation }) { 
+  
   const [showSettings, setShowSettings] = useState(false);
   const [selectedTime, setSelectedTime] = useState(new Date());
 
@@ -45,10 +46,10 @@ const Home = () => {
       <TouchableOpacity style={styles.settingsItem}>
         <Text style={styles.settingsText}>Your Profile</Text>
       </TouchableOpacity>
-      <TouchableOpacity style={styles.settingsItem}>
+      {/* <TouchableOpacity style={styles.settingsItem}>
         <Text style={styles.settingsText}>Switch to Dark Mode</Text>
-      </TouchableOpacity>
-      <TouchableOpacity style={styles.settingsItem}>
+      </TouchableOpacity> */}
+      <TouchableOpacity style={styles.settingsItem} onPress={() => navigation.navigate('EmergencyContacts')}>
         <Text style={styles.settingsText}>Emergency Contacts</Text>
       </TouchableOpacity>
       <TouchableOpacity style={styles.settingsItem}>

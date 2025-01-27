@@ -8,6 +8,10 @@ import {
   Modal,
   TextInput,
 } from 'react-native';
+import { createStackNavigator } from '@react-navigation/stack';
+import { NavigationContainer } from '@react-navigation/native';
+import { createStaticNavigation, useNavigation,} from '@react-navigation/native';
+import { createNativeStackNavigator } from '@react-navigation/native-stack';
 
 function EmergencyContacts({ navigation }) {
   const [isModalVisible, setIsModalVisible] = useState(false);
