@@ -1,43 +1,56 @@
-import React from 'react';
-import { View, Text, StyleSheet, TouchableOpacity, ScrollView } from 'react-native';
+import React, { useState, useEffect } from 'react';
+import { View, Text, StyleSheet, TouchableOpacity, ScrollView, Alert } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
+import ApiServer from './../Services/ApiServer';
+import * as FileSystem from 'expo-file-system';
+import * as Sharing from 'expo-sharing';
 
-function GroceryList ({ navigation }) {
-  const groceryData = {
-    grainsAndStaples: [
-      { item: 'Red Rice', quantity: '500g' },
-      { item: 'Brown Rice', quantity: '500g' },
-      { item: 'String Hoppers', quantity: '1 packet' },
-      { item: 'Coconut Milk', quantity: '2 cans (400ml each)' }
-    ],
-    proteins: [
-      { item: 'Fish (for fish curry and grilled fish)', quantity: '300g' },
-      { item: 'Chicken', quantity: '500g (for chicken curry)' },
-      { item: 'Tofu', quantity: '250g (for stir-fry)' },
-      { item: 'Eggs', quantity: '6 large' }
-    ],
-    vegetablesAndGreens: [
-      { item: 'Spinach or Gotu Kola', quantity: '2 large bunches' },
-      { item: 'Mukunuwenna', quantity: '1 large bunch' },
-      { item: 'Okra (Ladies\' Fingers)', quantity: '250g' },
-      { item: 'Brinjal (Eggplant)', quantity: '300g' },
-      { item: 'Snake Gourd', quantity: '1 medium' },
-      { item: 'Pumpkin', quantity: '300g' },
-      { item: 'Carrots', quantity: '250g' },
-      { item: 'Green Beans', quantity: '250g' },
-      { item: 'Mixed Bell Peppers', quantity: '1 each of red, green, and yellow' },
-      { item: 'Tomatoes', quantity: '6 medium' },
-      { item: 'Onions', quantity: '4 large' },
-      { item: 'Green Chillies', quantity: '100g' },
-      { item: 'Cucumber', quantity: '2 large' }
-    //   { item: 'Fresh Herbs', quantity: '1 bunch each of curry leaves, coriander, and pandan leaves' }
-    ]
-  };
+function GroceryList({ navigation, route }) {
 
-  const renderSection = (title, items) => (
+  const { mealIds } = route.params;
+  const [ingredientData, setingredientData] = useState({});
+
+  useEffect(() => {
+    const endpoint = '/api/meal/getIngredients';
+
+    const body = {
+      food_ids: mealIds,
+    }
+
+    ApiServer.call(endpoint, 'POST', body)
+      .then(data => {
+        setingredientData(data);
+      })
+      .catch(error => {
+        Alert.alert('Data request failed', error.message);
+      });
+  }, []);
+
+  async function downloadFile() {
+    try {
+      const pdfUrl = ApiServer.baseServer + "/api/meal/getIngredientPDF";
+      const fileUri = `${FileSystem.documentDirectory}grocery-list.pdf`;
+
+      const response = await FileSystem.downloadAsync(pdfUrl, fileUri);
+
+      if (response.status === 200) {
+        Alert.alert('Download Complete', 'File downloaded successfully.');
+        const canShare = await Sharing.isAvailableAsync();
+        if (canShare) {
+          await Sharing.shareAsync(fileUri);
+        }
+      } else {
+        Alert.alert('Download Failed', 'Failed to download the file.');
+      }
+    } catch (error) {
+      console.error('Download Error:', error);
+      Alert.alert('Error', 'An error occurred while downloading the file.');
+    }
+  }
+
+  const renderSection = (items) => (
     <View style={styles.section}>
-      <Text style={styles.sectionTitle}>{title}</Text>
       {items.map((item, index) => (
         <View key={index} style={styles.itemRow}>
           <Text style={styles.itemText}>{item.item}</Text>
@@ -50,24 +63,27 @@ function GroceryList ({ navigation }) {
   return (
     <SafeAreaView style={styles.container}>
       <View style={styles.header}>
-        <TouchableOpacity style={styles.backButton}>
+        <TouchableOpacity onPress={() => navigation.goBack()}>
           <Ionicons name="chevron-back" size={24} color="black" />
         </TouchableOpacity>
-        <Text style={styles.headerTitle}>Meal Planner</Text>
+        <Text style={styles.headerTitle}>Grocery List</Text>
+        <View style={styles.headerRight} />
       </View>
-      
+
       <ScrollView style={styles.content}>
         <Text style={styles.mainTitle}>Your weekly grocery items</Text>
-        
-        {renderSection('Grains and Staples', groceryData.grainsAndStaples)}
-        {renderSection('Proteins', groceryData.proteins)}
-        {renderSection('Vegetables and Greens', groceryData.vegetablesAndGreens)}
-        
-        <TouchableOpacity style={styles.downloadButton}>
+
+        {Object.keys(ingredientData).length !== 0 ? (
+          renderSection(ingredientData.ingredients)
+        ) : (
+          <Text>No ingredients available</Text>
+        )}
+
+        <TouchableOpacity style={styles.downloadButton} onPress={() => downloadFile()}>
           <Text style={styles.downloadButtonText}>Download into PDF</Text>
         </TouchableOpacity>
       </ScrollView>
-      
+
       <View style={styles.bottomNav}>
         <TouchableOpacity style={styles.navItem}>
           <Ionicons name="home-outline" size={24} color="gray" />
@@ -115,6 +131,10 @@ const styles = StyleSheet.create({
     fontWeight: '600',
     textAlign: 'center',
   },
+  headerRight: {
+    width: 24,
+  },
+
   content: {
     flex: 1,
     padding: 46,
@@ -150,13 +170,13 @@ const styles = StyleSheet.create({
     marginLeft: 16,
   },
   downloadButton: {
-        backgroundColor: 'rgba(24, 117, 195, 1)',
-        borderRadius: 120,
-        height: 48,
-        justifyContent: 'center',
-        alignItems: 'center',
-        marginBottom: 55,
-        marginTop: 5,
+    backgroundColor: 'rgba(24, 117, 195, 1)',
+    borderRadius: 120,
+    height: 48,
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginBottom: 55,
+    marginTop: 5,
   },
   downloadButtonText: {
     color: '#fff',

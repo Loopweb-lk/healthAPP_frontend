@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import {
     View,
     Text,
@@ -9,27 +9,35 @@ import {
 } from 'react-native';
 import { Feather, Ionicons } from '@expo/vector-icons';
 import { COLORS } from '../constants';
+import ApiServer from './../Services/ApiServer';
 
 function MealPlanner({ navigation }) {
-    const mealData = {
-        Friday: [
-            { name: 'String Hoppers', detail: 'Rice Curry', calorie: '256', type: 'Pol Sambol' },
-            { name: 'String Hoppers', detail: 'Rice Curry', calorie: '251', type: 'Pol Sambol' },
-            { name: 'String Hoppers', detail: 'Rice Curry', calorie: '252', type: 'Pol Sambol' },
-        ],
-        Saturday: [
-            { name: 'String Hoppers', detail: 'Rice Curry', calorie: '257', type: 'Pol Sambol' },
-            { name: 'String Hoppers', detail: 'Rice Curry', calorie: '216', type: 'Pol Sambol' },
-            { name: 'String Hoppers', detail: 'Rice Curry', calorie: '156', type: 'Pol Sambol' },
-        ],
-    };
 
-    const renderMealCard = (meal, index) => (
-        <View style={styles.mealCard} key={`${meal.name}-${meal.calorie}-${index}`}>
+    const [mealData, setMealData] = useState({});
+    const [MealIDs, setMealIDs] = useState(null);
+
+    useEffect(() => {
+        const endpoint = '/api/meal/getMeals';
+
+        ApiServer.call(endpoint, 'GET')
+            .then(data => {
+                setMealData(data.mealPlan);
+                setMealIDs(extractMealIds(data));
+            })
+            .catch(error => {
+                console.error('Login failed:', error);
+                Alert.alert('Login failed', error.message);
+            });
+    }, []);
+
+    const renderMealCard = (type, meal) => (
+        <View style={styles.mealCard} key={`${meal.name}-${meal.calorie}-${type}`}>
             <View style={styles.mealInfo}>
-                <Text style={styles.mealName}>{meal.name}</Text>
-                <Text style={styles.mealDetail}>{meal.detail}</Text>
-                <Text style={styles.mealType}>{meal.type}</Text>
+                <Text style={styles.mealName}>{meal.name.split(',')[0]}</Text>
+                {meal.name.split(',').length > 1 && (
+                    <Text style={styles.mealDetail}>{meal.name.split(',').slice(1).join(',').trim()}</Text>
+                )}
+                <Text style={styles.mealType}>{meal.category}</Text>
             </View>
             <View style={styles.calorieInfo}>
                 <Text style={styles.calorieText}>{meal.calorie} Cal</Text>
@@ -37,17 +45,29 @@ function MealPlanner({ navigation }) {
         </View>
     );
 
-    const renderDaySection = (day, meals) => (
+    const renderDaySection = (day, mealsObj) => (
         <View style={styles.daySection} key={day}>
-            <Text style={styles.dayTitle}>{day}</Text>
-            {meals.map((meal, index) => renderMealCard(meal, index))}
-            {meals.length > 0 && (
-                <Text style={styles.totalCalories}>
-                    Total Intake: {meals.reduce((sum, meal) => sum + parseInt(meal.calorie), 0)} Cal
-                </Text>
-            )}
+            <Text style={styles.dayTitle}>{toTitleCase(day)}</Text>
+            {renderMealCard('Breakfast', mealsObj.meals.breakfast)}
+            {renderMealCard('Lunch', mealsObj.meals.lunch)}
+            {renderMealCard('Snack', mealsObj.meals.snack)}
+            {renderMealCard('Dinner', mealsObj.meals.dinner)}
+            <Text style={styles.totalCalories}>Total Intake:  {mealsObj.totalCalories} Cal</Text>
         </View>
     );
+
+    function toTitleCase(str) {
+        return str.replace(
+            /\w\S*/g,
+            text => text.charAt(0).toUpperCase() + text.substring(1).toLowerCase()
+        );
+    }
+
+    function extractMealIds(data) {
+        return Object.values(data.mealPlan)
+            .flatMap(day => Object.values(day.meals).map(meal => meal.id))
+            .join(',');
+    }
 
     return (
         <SafeAreaView style={styles.container}>
@@ -65,7 +85,7 @@ function MealPlanner({ navigation }) {
 
             <TouchableOpacity
                 style={styles.groceryButton}
-                onPress={() => navigation.navigate('GroceryList')}
+                onPress={() => navigation.navigate('GroceryList', { mealIds: MealIDs })}
             >
                 <Text style={styles.groceryButtonText}>Go to grocery list</Text>
             </TouchableOpacity>
@@ -136,11 +156,13 @@ const styles = StyleSheet.create({
         padding: 16,
         marginBottom: 16,
     },
+
     dayTitle: {
         fontSize: 18,
         fontWeight: '600',
         marginBottom: 12,
     },
+
     mealCard: {
         flexDirection: 'row',
         justifyContent: 'space-between',
@@ -171,12 +193,15 @@ const styles = StyleSheet.create({
         color: '#1875C3',
         fontWeight: '500',
     },
+
     totalCalories: {
         color: '#2ECC71',
         fontSize: 14,
         fontWeight: '500',
         marginTop: 12,
+        textAlign: 'center',
     },
+
     groceryButton: {
         backgroundColor: '#1875C3',
         margin: 16,
