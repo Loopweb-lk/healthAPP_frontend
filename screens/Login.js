@@ -8,6 +8,7 @@ import {
     StyleSheet,
     ScrollView,
     Modal,
+    Alert,
 } from 'react-native';
 import { Feather } from '@expo/vector-icons';
 import ApiServer from './../Services/ApiServer';
@@ -40,10 +41,15 @@ function Login({ navigation }) {
             .then(data => {
                 if (data.message == "Login successful") {
                     navigation.navigate('BottomTabNavigation');
+                    Alert.alert('Login successful', data.message);
+                }else{
+                    Alert.alert('Login failed', data.message);
                 }
             })
             .catch(error => {
                 console.error('Login failed:', error);
+                Alert.alert('Login failed', data.message);
+
             });
     }
 
@@ -106,7 +112,7 @@ function Login({ navigation }) {
                     {/* Register Link */}
                     <View style={styles.loginContainer}>
                         <Text style={styles.loginText}>Don't have an account? </Text>
-                        <TouchableOpacity onPress={() => navigation.navigate('Register')}>
+                        <TouchableOpacity onPress={() => navigation.navigate('GroceryList')}>
                             <Text style={styles.loginLink}>Register</Text>
                         </TouchableOpacity>
                     </View>
