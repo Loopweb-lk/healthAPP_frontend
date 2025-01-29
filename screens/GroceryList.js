@@ -79,9 +79,12 @@ function GroceryList({ navigation, route }) {
           <Text>No ingredients available</Text>
         )}
 
-        <TouchableOpacity style={styles.downloadButton} onPress={() => downloadFile()}>
-          <Text style={styles.downloadButtonText}>Download into PDF</Text>
-        </TouchableOpacity>
+        {Object.keys(ingredientData).length !== 0 ? (
+          <TouchableOpacity style={styles.downloadButton} onPress={() => downloadFile()}>
+            <Text style={styles.downloadButtonText}>Download into PDF</Text>
+          </TouchableOpacity>
+        ) : ("")}
+
       </ScrollView>
 
       <View style={styles.bottomNav}>
