@@ -183,7 +183,7 @@ function Home({ navigation }) {
         </View>
 
         {/* Meal Planner */}
-        <TouchableOpacity style={[styles.card, styles.mealPlannerCard]}>
+        <TouchableOpacity style={[styles.card, styles.mealPlannerCard]} onPress={() => navigation.navigate('MealPlanner')}>
           <View style={styles.mealPlannerContent}>
             <Icon name="restaurant-outline" size={24} color="#4CAF50" />
             <View style={styles.mealPlannerText}>
