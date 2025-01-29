@@ -16,6 +16,7 @@ import EmergencyContacts from './screens/EmergencyContacts';
 import MealPlanner from './screens/MealPlanner';
 import EnterMealItems from './screens/EnterMealItems';
 import RecordMeal from './screens/RecordMeal';
+import GroceryList from './screens/GroceryList';
 
 // Prevent SplashScreen from auto-hiding until ready
 SplashScreen.preventAutoHideAsync();
@@ -87,6 +88,7 @@ export default function App() {
             <Stack.Screen name="EnterMealItems" component={EnterMealItems} />
             <Stack.Screen name="EditProfile" component={EditProfile} />
             <Stack.Screen name="RecordMeal" component={RecordMeal} />
+            <Stack.Screen name="GroceryList" component={GroceryList} />
           </>
         )}
         
