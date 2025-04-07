@@ -56,7 +56,7 @@ function TrackActivity({ navigation }) {
         </TouchableOpacity>
       </View>
       
-      {/* <View style={styles.tabBar}>
+      <View style={styles.tabBar}>
         <TouchableOpacity style={styles.tabItem}>
           <Ionicons name="home-outline" size={24} color="#666" />
           <Text style={styles.tabLabel}>Home</Text>
@@ -77,7 +77,7 @@ function TrackActivity({ navigation }) {
           <Ionicons name="bar-chart-outline" size={24} color="#666" />
           <Text style={styles.tabLabel}>Analytics</Text>
         </TouchableOpacity>
-      </View> */}
+      </View>
     </SafeAreaView>
   );
 }
@@ -92,7 +92,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     paddingHorizontal: 16,
     paddingVertical: 12,
-    marginTop: 16,
+    marginTop: 26,
     marginLeft: 10,
   },
   backButton: {
