@@ -10,7 +10,8 @@ import {
 } from 'react-native';
 import Icon from 'react-native-vector-icons/Ionicons';
 
-const EnterMealItems = () => {
+function EnterMealItems({ navigation }) {
+
   const [calories, setCalories] = useState(0);
   const [searchQuery, setSearchQuery] = useState('');
 

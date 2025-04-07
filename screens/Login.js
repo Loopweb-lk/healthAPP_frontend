@@ -112,7 +112,7 @@ function Login({ navigation }) {
                     {/* Register Link */}
                     <View style={styles.loginContainer}>
                         <Text style={styles.loginText}>Don't have an account? </Text>
-                        <TouchableOpacity onPress={() => navigation.navigate('GroceryList')}>
+                        <TouchableOpacity onPress={() => navigation.navigate('Register')}>
                             <Text style={styles.loginLink}>Register</Text>
                         </TouchableOpacity>
                     </View>

@@ -3,7 +3,8 @@ import React, { useState } from 'react';
 import { Feather, Ionicons } from '@expo/vector-icons';
 import DateTimePicker from '@react-native-community/datetimepicker';
 
-const Meals = () => {
+function Meals({ navigation }) {
+
   const [modalVisible, setModalVisible] = useState(false);
   const [fromDate, setFromDate] = useState(new Date());
   const [toDate, setToDate] = useState(new Date());
