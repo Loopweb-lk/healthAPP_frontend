@@ -19,6 +19,7 @@ import RecordMeal from './screens/RecordMeal';
 import GroceryList from './screens/GroceryList';
 import Walking from './screens/Walking';
 import WalkingTrackEnd from './screens/WalkingTrackEnd';
+import ActivityOverview from './screens/ActivityOverview';
 
 // Prevent SplashScreen from auto-hiding until ready
 SplashScreen.preventAutoHideAsync();
@@ -94,6 +95,8 @@ export default function App() {
             <Stack.Screen name="GroceryList" component={GroceryList} />
             <Stack.Screen name="Walking" component={Walking} />
             <Stack.Screen name="WalkingTrackEnd" component={WalkingTrackEnd} />
+            <Stack.Screen name="ActivityOverview" component={ActivityOverview} />
+
 
           </>
         )}
