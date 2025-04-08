@@ -17,7 +17,6 @@ import MealPlanner from './screens/MealPlanner';
 import EnterMealItems from './screens/EnterMealItems';
 import RecordMeal from './screens/RecordMeal';
 import GroceryList from './screens/GroceryList';
-import TrackActivity from './screens/TrackActivity';
 import Walking from './screens/Walking';
 import WalkingTrackEnd from './screens/WalkingTrackEnd';
 
@@ -93,7 +92,6 @@ export default function App() {
             <Stack.Screen name="EditProfile" component={EditProfile} />
             <Stack.Screen name="RecordMeal" component={RecordMeal} />
             <Stack.Screen name="GroceryList" component={GroceryList} />
-            <Stack.Screen name="TrackActivity" component={TrackActivity} />
             <Stack.Screen name="Walking" component={Walking} />
             <Stack.Screen name="WalkingTrackEnd" component={WalkingTrackEnd} />
 

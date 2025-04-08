@@ -30,7 +30,7 @@ function Login({ navigation }) {
     };
 
     const login = () => {
-        navigation.navigate('TrackActivity');
+        navigation.navigate('BottomTabNavigation');
 
         // const endpoint = '/api/auth/login';
 

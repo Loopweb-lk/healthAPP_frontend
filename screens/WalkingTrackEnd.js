@@ -19,10 +19,10 @@ function WalkingTrackEnd({ navigation }) {
       <View style={styles.content}>
         {/* Running Figure */}
         <View style={styles.illustrationContainer}>
-          <Image 
-            source={require('../assets/images/walking-icon.png')} 
+          <Image
+            source={require('../assets/images/walking-icon.png')}
             style={styles.runningFigure}
-            // Alternatively, you could use an SVG component here
+          // Alternatively, you could use an SVG component here
           />
         </View>
 
@@ -40,7 +40,7 @@ function WalkingTrackEnd({ navigation }) {
       </View>
 
       {/* Bottom Navigation */}
-      <View style={styles.bottomNav}>
+      {/* <View style={styles.bottomNav}>
         <TouchableOpacity style={styles.navItem}>
           <Ionicons name="home-outline" size={24} color="#8E8E8E" />
           <Text style={styles.navText}>Home</Text>
@@ -61,7 +61,7 @@ function WalkingTrackEnd({ navigation }) {
           <Ionicons name="stats-chart-outline" size={24} color="#8E8E8E" />
           <Text style={styles.navText}>Stats</Text>
         </TouchableOpacity>
-      </View>
+      </View> */}
     </SafeAreaView>
   );
 }
@@ -90,11 +90,15 @@ const styles = StyleSheet.create({
     paddingBottom: 60, // Space for bottom nav
   },
   illustrationContainer: {
-    marginBottom: 30,
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginVertical: 20,
+    height: 350,
   },
   runningFigure: {
-    width: 120,
-    height: 120,
+    width: 350,
+    height: 350,
+    resizeMode: 'contain',
     // If using actual image, you might need to adjust these dimensions
   },
   calorieInfo: {
@@ -102,36 +106,40 @@ const styles = StyleSheet.create({
     marginBottom: 30,
   },
   calorieLabel: {
-    fontSize: 18,
-    color: '#1E88E5',
+    fontSize: 32,
+    color: '#1875C3',
     fontWeight: '500',
-    marginBottom: 8,
   },
   calorieValue: {
-    fontSize: 60,
+    fontSize: 80,
     fontWeight: 'bold',
-    color: '#1E88E5',
+    color: '#1875C3',
   },
   calorieUnit: {
     fontSize: 24,
     fontWeight: '500',
   },
   equivalentText: {
-    fontSize: 14,
+    fontSize: 18,
     color: '#ACACAC',
-    marginTop: 8,
+    marginTop: 5,
   },
   statsButton: {
-    backgroundColor: '#1E88E5',
+    backgroundColor: '#1875C3',
     paddingVertical: 14,
     paddingHorizontal: 30,
-    borderRadius: 24,
+    borderRadius: 25,
     marginTop: 20,
+    width: '80%',
+    alignItems: 'center',
+    height: 65,
   },
   statsButtonText: {
     color: '#FFFFFF',
     fontSize: 16,
     fontWeight: '500',
+    textAlign: 'center',
+    marginTop: 7,
   },
   bottomNav: {
     position: 'absolute',

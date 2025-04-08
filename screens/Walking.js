@@ -1,12 +1,31 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { View, Text, StyleSheet, TouchableOpacity, Image } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
 
 function Walking({ navigation }) {
-  // State for timer and pause functionality
   const [isPaused, setIsPaused] = useState(false);
-  
+  const [timeInSeconds, setTimeInSeconds] = useState(2412); // 40 minutes and 12 seconds
+  const intervalRef = useRef(null);
+
+  useEffect(() => {
+    if (!isPaused) {
+      intervalRef.current = setInterval(() => {
+        setTimeInSeconds((prevTime) => (prevTime > 0 ? prevTime + 1 : 0));
+      }, 1000);
+    } else {
+      clearInterval(intervalRef.current);
+    }
+
+    return () => clearInterval(intervalRef.current);
+  }, [isPaused]);
+
+  const formatTime = (seconds) => {
+    const mins = Math.floor(seconds / 60);
+    const secs = seconds % 60;
+    return `${String(mins).padStart(2, '0')}:${String(secs).padStart(2, '0')}`;
+  };
+
   return (
     <SafeAreaView style={styles.container}>
       {/* Header */}
@@ -17,60 +36,31 @@ function Walking({ navigation }) {
         <Text style={styles.headerTitle}>Track Activity</Text>
         <View style={styles.placeholder} />
       </View>
-      
+
       {/* Activity Title */}
       <Text style={styles.activityTitle}>Walking</Text>
-      
+
       {/* Runner Illustration */}
       <View style={styles.illustrationContainer}>
         <Image
           source={require('../assets/images/walking-icon.png')}
           style={styles.illustration}
         />
-        {/* If you don't have the exact image, you can use a placeholder or create a simple SVG component */}
       </View>
-      
+
       {/* Timer Display */}
       <View style={styles.timerContainer}>
-        <Text style={styles.timer}>40:12</Text>
+        <Text style={styles.timer}>{formatTime(timeInSeconds)}</Text>
         <Text style={styles.timerSubtext}>20 more minutes to reach daily average</Text>
       </View>
-      
-      {/* Pause Button */}
+
+      {/* Pause/Play Button */}
       <TouchableOpacity 
         style={styles.pauseButton}
         onPress={() => setIsPaused(!isPaused)}
       >
-        <Ionicons name={isPaused ? "play" : "pause"} size={24} color="white" />
+        <Ionicons name={isPaused ? "play" : "pause"} size={30} color="white" />
       </TouchableOpacity>
-      
-      {/* Bottom Tab Navigation */}
-      <View style={styles.tabBar}>
-        <TouchableOpacity style={styles.tabItem}>
-          <Ionicons name="home-outline" size={24} color="#c0c0c0" />
-          <Text style={styles.tabLabel}>Home</Text>
-        </TouchableOpacity>
-        
-        <TouchableOpacity style={styles.tabItem}>
-          <Ionicons name="musical-notes-outline" size={24} color="#c0c0c0" />
-          <Text style={styles.tabLabel}>Music</Text>
-        </TouchableOpacity>
-        
-        <TouchableOpacity style={[styles.tabItem, styles.activeTab]}>
-          <Ionicons name="walk-outline" size={24} color="#007AFF" />
-          <Text style={[styles.tabLabel, styles.activeTabLabel]}>Exercise</Text>
-        </TouchableOpacity>
-        
-        <TouchableOpacity style={styles.tabItem}>
-          <Ionicons name="water-outline" size={24} color="#c0c0c0" />
-          <Text style={styles.tabLabel}>Sleep</Text>
-        </TouchableOpacity>
-        
-        <TouchableOpacity style={styles.tabItem}>
-          <Ionicons name="stats-chart-outline" size={24} color="#c0c0c0" />
-          <Text style={styles.tabLabel}>Analytics</Text>
-        </TouchableOpacity>
-      </View>
     </SafeAreaView>
   );
 }
@@ -86,16 +76,17 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
     paddingHorizontal: 16,
     height: 50,
+    marginTop: 18,
   },
   headerTitle: {
-    fontSize: 16,
-    fontWeight: '500',
+    fontSize: 18,
+    fontWeight: '700',
   },
   placeholder: {
     width: 24,
   },
   activityTitle: {
-    fontSize: 24,
+    fontSize: 35,
     fontWeight: 'bold',
     textAlign: 'center',
     marginVertical: 10,
@@ -104,63 +95,37 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
     marginVertical: 20,
-    height: 200,
+    height: 350,
   },
   illustration: {
-    width: 150,
-    height: 150,
+    width: 350,
+    height: 350,
     resizeMode: 'contain',
   },
   timerContainer: {
     alignItems: 'center',
     marginVertical: 20,
+    marginTop: -10,
   },
   timer: {
-    fontSize: 48,
+    fontSize: 68,
     fontWeight: 'bold',
-    color: '#007AFF',
+    color: '#1875C3',
   },
   timerSubtext: {
-    fontSize: 14,
+    fontSize: 17,
     color: '#666',
-    marginTop: 5,
+    marginTop: 8,
   },
   pauseButton: {
-    width: 60,
-    height: 60,
-    borderRadius: 30,
-    backgroundColor: '#007AFF',
+    width: 95,
+    height: 95,
+    borderRadius: 50,
+    backgroundColor: '#1875C3',
     alignItems: 'center',
     justifyContent: 'center',
     alignSelf: 'center',
     marginVertical: 20,
-  },
-  tabBar: {
-    flexDirection: 'row',
-    justifyContent: 'space-around',
-    borderTopWidth: 1,
-    borderTopColor: '#f0f0f0',
-    paddingVertical: 10,
-    position: 'absolute',
-    bottom: 0,
-    left: 0,
-    right: 0,
-    backgroundColor: '#fff',
-  },
-  tabItem: {
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  tabLabel: {
-    fontSize: 12,
-    marginTop: 4,
-    color: '#c0c0c0',
-  },
-  activeTab: {
-    color: '#007AFF',
-  },
-  activeTabLabel: {
-    color: '#007AFF',
   },
 });
 
