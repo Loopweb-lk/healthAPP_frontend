@@ -6,7 +6,8 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
 
 
-const RecordMeal = () => {
+function RecordMeal({ navigation }) {
+
     const [selectedDate, setSelectedDate] = useState('');
 
     return (
@@ -166,7 +167,7 @@ const styles = StyleSheet.create({
         marginBottom: 24,
         marginTop: 15,
         width: '90%',
-       alignSelf: 'center'
+        alignSelf: 'center'
     },
     saveButtonText: {
         color: '#fff',

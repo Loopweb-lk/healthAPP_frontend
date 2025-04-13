@@ -30,7 +30,7 @@ function Login({ navigation }) {
     };
 
     const login = () => {
-        navigation.navigate('ActivityOverview');
+        navigation.navigate('RecordMeal');
 
         // const endpoint = '/api/auth/login';
 
