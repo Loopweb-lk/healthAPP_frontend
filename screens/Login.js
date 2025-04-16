@@ -30,7 +30,7 @@ function Login({ navigation }) {
     };
 
     const login = () => {
-        navigation.navigate('EnterActivityTime');
+        navigation.navigate('SugarHistory');
 
         // const endpoint = '/api/auth/login';
 
