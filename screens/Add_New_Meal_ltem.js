@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { View, Text, StyleSheet, TouchableOpacity, TextInput, Image, ScrollView } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
+import Icon from 'react-native-vector-icons/Ionicons';
 
 function Add_New_Meal_ltem({ navigation }) {
   const [selectedIcon, setSelectedIcon] = useState(null);
@@ -30,7 +31,7 @@ function Add_New_Meal_ltem({ navigation }) {
         {/* Header with back button */}
         <View style={styles.header}>
           <TouchableOpacity onPress={() => navigation.goBack()} style={styles.backButton}>
-            <Ionicons name="arrow-back" size={24} color="#000" />
+            <Icon name="chevron-back" size={24} color="#000" />
           </TouchableOpacity>
           <Text style={styles.headerTitle}>Add New Meal Item</Text>
         </View>
@@ -43,7 +44,6 @@ function Add_New_Meal_ltem({ navigation }) {
             style={styles.input}
             value={itemName}
             onChangeText={setItemName}
-            placeholder="Enter item name"
           />
 
           {/* Estimated Calory Level */}
@@ -52,7 +52,6 @@ function Add_New_Meal_ltem({ navigation }) {
             style={styles.input}
             value={calories}
             onChangeText={setCalories}
-            placeholder="Enter calories"
             keyboardType="numeric"
           />
 
@@ -62,7 +61,6 @@ function Add_New_Meal_ltem({ navigation }) {
             style={styles.input}
             value={quantity}
             onChangeText={setQuantity}
-            placeholder="Enter quantity"
           />
 
           {/* Choose Icon */}
@@ -96,6 +94,7 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: '#f5f5f5',
+    padding: 10,
   },
   scrollContainer: {
     flexGrow: 1,
@@ -159,11 +158,14 @@ const styles = StyleSheet.create({
     resizeMode: 'contain',
   },
   addButton: {
-    backgroundColor: '#007bff',
+    backgroundColor: '#1875C3',
     borderRadius: 25,
     padding: 16,
     alignItems: 'center',
     justifyContent: 'center',
+    height: 60,
+    width: '100%',
+    alignSelf: 'center',
   },
   addButtonText: {
     color: 'white',

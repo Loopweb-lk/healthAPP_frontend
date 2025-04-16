@@ -7,7 +7,6 @@ import {
   StyleSheet,
   SafeAreaView,
   StatusBar,
-  Image,
 } from 'react-native';
 import { ScrollView } from 'react-native-gesture-handler';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
@@ -19,105 +18,30 @@ function EnterMealItems({ navigation }) {
   const [selectedItems, setSelectedItems] = useState([]);
 
   const mealItems = [
-    {
-      id: 1,
-      name: 'Bullseye',
-      quantity: 1,
-      image: require('./../assets/images/Bullseye.png'),
-      calories: 120,
-    },
-    {
-      id: 2,
-      name: 'Rice Bowl',
-      quantity: 1,
-      image: require('./../assets/images/Bullseye.png'),
-      calories: 250,
-    },
-    {
-      id: 3,
-      name: 'Ice Cream',
-      quantity: 1,
-      image: require('./../assets/images/Bullseye.png'),
-      calories: 200,
-    },
-    {
-      id: 4,
-      name: 'Salad',
-      quantity: 1,
-      image: require('./../assets/images/Bullseye.png'),
-      calories: 90,
-    },
-    {
-      id: 5,
-      name: 'Sandwich',
-      quantity: 1,
-      image: require('./../assets/images/Bullseye.png'),
-      calories: 300,
-    },
-    {
-      id: 6,
-      name: 'Sandwich',
-      quantity: 1,
-      image: require('./../assets/images/Bullseye.png'),
-      calories: 100,
-    },
-    {
-      id: 7,
-      name: 'Salad',
-      quantity: 1,
-      image: require('./../assets/images/Bullseye.png'),
-      calories: 80,
-    },
-    {
-      id: 8,
-      name: 'Sandwich',
-      quantity: 1,
-      image: require('./../assets/images/Bullseye.png'),
-      calories: 300,
-    },
-    {
-      id: 9,
-      name: 'Sandwich',
-      quantity: 1,
-      image: require('./../assets/images/Bullseye.png'),
-      calories: 100,
-    },
-    {
-      id: 10,
-      name: 'Salad',
-      quantity: 1,
-      image: require('./../assets/images/Bullseye.png'),
-      calories: 80,
-    },
-    {
-      id: 11,
-      name: 'Sandwich',
-      quantity: 1,
-      image: require('./../assets/images/Bullseye.png'),
-      calories: 350,
-    },
-    {
-      id: 12,
-      name: 'Sandwich',
-      quantity: 1,
-      image: require('./../assets/images/Bullseye.png'),
-      calories: 200,
-    },
+    { id: 1, name: 'Bullseye', quantity: 1 },
+    { id: 2, name: 'Rice Bowl', quantity: 1 },
+    { id: 3, name: 'Ice Cream', quantity: 1 },
+    { id: 4, name: 'Salad', quantity: 1 },
+    { id: 5, name: 'Sandwich', quantity: 1 },
+    { id: 6, name: 'Ice Cream', quantity: 1 },
+    { id: 7, name: 'Bullseye', quantity: 1 },
+    { id: 8, name: 'Rice Bowl', quantity: 1 },
+    { id: 9, name: 'Ice Cream', quantity: 1 },
+    { id: 10, name: 'Salad', quantity: 1 },
+    { id: 11, name: 'Sandwich', quantity: 1 },
+    { id: 12, name: 'Ice Cream', quantity: 1 },
+    { id: 13, name: 'Salad', quantity: 1 },
+    { id: 14, name: 'Sandwich', quantity: 1 },
+    { id: 15, name: 'Ice Cream', quantity: 1 },
   ];
 
-  const toggleSelect = (id) => {
-    const isSelected = selectedItems.includes(id);
-    const item = mealItems.find((item) => item.id === id);
-
-    if (isSelected) {
-      setSelectedItems((prev) => prev.filter((itemId) => itemId !== id));
-      setCalories((prev) => prev - item.calories);
-    } else {
-      setSelectedItems((prev) => [...prev, id]);
-      setCalories((prev) => prev + item.calories);
-    }
+  const toggleSelectItem = (itemId) => {
+    setSelectedItems((prevSelected) =>
+      prevSelected.includes(itemId)
+        ? prevSelected.filter((id) => id !== itemId)
+        : [...prevSelected, itemId]
+    );
   };
-
 
   const renderMealItem = (item) => {
     const isSelected = selectedItems.includes(item.id);
@@ -126,11 +50,10 @@ function EnterMealItems({ navigation }) {
         key={item.id}
         style={[
           styles.mealItem,
-          isSelected && { backgroundColor: '#cce5ff' },
+          isSelected && { borderColor: '#1875C3', borderWidth: 2 },
         ]}
-        onPress={() => toggleSelect(item.id)}
+        onPress={() => toggleSelectItem(item.id)}
       >
-        <Image source={item.image} style={styles.mealImage} />
         <Text style={styles.mealItemText}>{item.name}</Text>
         <Text style={styles.quantityText}>x {item.quantity}</Text>
       </TouchableOpacity>
@@ -141,6 +64,8 @@ function EnterMealItems({ navigation }) {
     <GestureHandlerRootView style={styles.container}>
       <SafeAreaView style={styles.container}>
         <StatusBar barStyle="dark-content" />
+
+        {/* Header */}
         <View style={styles.header}>
           <TouchableOpacity onPress={() => navigation.goBack()}>
             <Icon name="chevron-back" size={24} color="#000" />
@@ -149,15 +74,18 @@ function EnterMealItems({ navigation }) {
 
         <Text style={styles.headerTitle}>Enter Meal Items</Text>
 
+        {/* Calories Display */}
         <View style={styles.caloriesContainer}>
           <Text style={styles.caloriesTitle}>Your Meal Contains</Text>
-          <Text style={styles.caloriesValue}>{calories}<Text style={styles.caloriesUnit}>Cal</Text></Text>
+          <Text style={styles.caloriesValue}>{calories}</Text>
+          <Text style={styles.caloriesUnit}>Cal</Text>
           <Text style={styles.nutritionHint}>
-            Only contains starch and sugar{'\n'}Try adding more vegetables, less
-            Oils
+            Only contains starch and sugar{'\n'}
+            Try adding more vegetables, less Oils
           </Text>
         </View>
 
+        {/* Search Bar */}
         <View style={styles.searchRow}>
           <View style={styles.searchContainer}>
             <Icon name="search" size={16} color="#666" style={styles.searchIcon} />
@@ -170,17 +98,24 @@ function EnterMealItems({ navigation }) {
             />
           </View>
 
-          <TouchableOpacity style={styles.addButton} onPress={() => navigation.navigate('Add_New_Meal_ltem')}>
+          <TouchableOpacity style={styles.addButton}>
             <Icon name="add" size={20} color="#666" />
           </TouchableOpacity>
         </View>
 
+        {/* Scrollable Meal Items */}
         <ScrollView contentContainerStyle={styles.mealItemsContainer}>
           {mealItems.map(renderMealItem)}
         </ScrollView>
 
+        {/* Bottom Navigation */}
         <View style={styles.bottomNav}>
-          <TouchableOpacity style={styles.nextButton}>
+          <TouchableOpacity
+            style={styles.nextButton}
+            onPress={() => {
+              console.log('Selected Items:', selectedItems);
+            }}
+          >
             <Text style={styles.nextButtonText}>Next</Text>
           </TouchableOpacity>
         </View>
@@ -220,7 +155,7 @@ const styles = StyleSheet.create({
     fontSize: 70,
     fontWeight: '500',
     color: '#1875C3',
-    marginRight: -20,
+    marginRight: 40,
   },
   caloriesUnit: {
     fontSize: 30,
@@ -284,18 +219,10 @@ const styles = StyleSheet.create({
     margin: 4,
     justifyContent: 'center',
     alignItems: 'center',
-    padding: 6,
-  },
-  mealImage: {
-    width: 50,
-    height: 50,
-    borderRadius: 25,
-    marginBottom: 8,
   },
   mealItemText: {
     fontSize: 14,
     fontWeight: '500',
-    textAlign: 'center',
   },
   quantityText: {
     fontSize: 12,
@@ -324,6 +251,14 @@ const styles = StyleSheet.create({
     left: 0,
     right: 0,
     backgroundColor: '#ffffff96',
+  },
+  navItem: {
+    alignItems: 'center',
+  },
+  navText: {
+    fontSize: 12,
+    color: '#666',
+    marginTop: 4,
   },
 });
 
