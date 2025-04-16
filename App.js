@@ -21,6 +21,7 @@ import Walking from './screens/Walking';
 import WalkingTrackEnd from './screens/WalkingTrackEnd';
 import ActivityOverview from './screens/ActivityOverview';
 import Add_New_Meal_ltem from './screens/Add_New_Meal_ltem';
+import EnterActivityTime from './screens/EnterActivityTime';
 
 // Prevent SplashScreen from auto-hiding until ready
 SplashScreen.preventAutoHideAsync();
@@ -98,7 +99,7 @@ export default function App() {
             <Stack.Screen name="WalkingTrackEnd" component={WalkingTrackEnd} />
             <Stack.Screen name="ActivityOverview" component={ActivityOverview} />
             <Stack.Screen name="Add_New_Meal_ltem" component={Add_New_Meal_ltem} />
-
+            <Stack.Screen name="EnterActivityTime" component={EnterActivityTime} />
 
           </>
         )}

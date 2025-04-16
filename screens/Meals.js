@@ -259,7 +259,7 @@ function Meals({ navigation }) {
                 borderColor: 'rgba(24, 117, 195, 1)',
                 width: '100%'
               }}
-              onPress={() => navigation.navigate('BottomTabNavigation')}
+              onPress={() => navigation.navigate('EnterMealItems')}
             >
               <Text style={{ color: 'rgba(24, 117, 195, 1)', fontSize: 16 }}>Record New Template</Text>
             </TouchableOpacity>

@@ -47,7 +47,7 @@ function Create({ navigation }) {
           ))}
         </View>
 
-        <TouchableOpacity style={styles.trackButton}>
+        <TouchableOpacity style={styles.trackButton} onPress={() => navigation.navigate('Walking')}>
           <Text style={styles.trackButtonText}>Start Tracking</Text>
         </TouchableOpacity>
 

@@ -30,7 +30,7 @@ function Login({ navigation }) {
     };
 
     const login = () => {
-        navigation.navigate('EnterMealItems');
+        navigation.navigate('EnterActivityTime');
 
         // const endpoint = '/api/auth/login';
 
