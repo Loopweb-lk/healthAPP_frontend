@@ -24,6 +24,8 @@ import Add_New_Meal_ltem from './screens/Add_New_Meal_ltem';
 import EnterActivityTime from './screens/EnterActivityTime';
 import Calender from './screens/Calender';
 import SugarHistory from './screens/SugarHistory';
+import RecordSugar from './screens/RecordSugar';
+import UserProfile from './screens/UserProfile';
 
 // Prevent SplashScreen from auto-hiding until ready
 SplashScreen.preventAutoHideAsync();
@@ -104,6 +106,8 @@ export default function App() {
             <Stack.Screen name="EnterActivityTime" component={EnterActivityTime} />
             <Stack.Screen name="Calender" component={Calender} />
             <Stack.Screen name="SugarHistory" component={SugarHistory} />
+            <Stack.Screen name="RecordSugar" component={RecordSugar} />
+            <Stack.Screen name="UserProfile" component={UserProfile} />
 
           </>
         )}

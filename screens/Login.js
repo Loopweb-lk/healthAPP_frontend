@@ -30,7 +30,7 @@ function Login({ navigation }) {
     };
 
     const login = () => {
-        navigation.navigate('SugarHistory');
+        navigation.navigate('UserProfile');
 
         // const endpoint = '/api/auth/login';
 

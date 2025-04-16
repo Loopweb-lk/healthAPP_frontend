@@ -1,7 +1,16 @@
-import React from 'react';
-import { View, Text, StyleSheet, TouchableOpacity, ScrollView } from 'react-native';
+import React, { useState } from 'react';
+import {
+  View,
+  Text,
+  StyleSheet,
+  TouchableOpacity,
+  ScrollView,
+  Modal,
+  Pressable,
+} from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
+import DateTimePicker from '@react-native-community/datetimepicker';
 
 function SugarHistory({ navigation }) {
   const sugarRecords = [
@@ -17,7 +26,8 @@ function SugarHistory({ navigation }) {
       date: '2024-12-26',
       level: '100',
       timing: 'Dinner',
-      notes: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Quisque varius turpis id vehicula faucibus. Vestibulum.',
+      notes:
+        'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Quisque varius turpis id vehicula faucibus. Vestibulum.',
     },
     {
       id: '3',
@@ -35,14 +45,37 @@ function SugarHistory({ navigation }) {
     },
   ];
 
+  const [isFilterModalVisible, setFilterModalVisible] = useState(false);
+  const [fromDate, setFromDate] = useState(new Date());
+  const [toDate, setToDate] = useState(new Date());
+  const [showFromDatePicker, setShowFromDatePicker] = useState(false);
+  const [showToDatePicker, setShowToDatePicker] = useState(false);
+
+  const handleDateChange = (event, selectedDate, type) => {
+    const currentDate = selectedDate || (type === 'from' ? fromDate : toDate);
+    if (type === 'from') {
+      setFromDate(currentDate);
+    } else {
+      setToDate(currentDate);
+    }
+    setShowFromDatePicker(false);
+    setShowToDatePicker(false);
+  };
+
   return (
     <SafeAreaView style={styles.container}>
       <View style={styles.header}>
-        <TouchableOpacity onPress={() => navigation.goBack()} style={styles.backButton}>
+        <TouchableOpacity
+          onPress={() => navigation.goBack()}
+          style={styles.backButton}
+        >
           <Ionicons name="chevron-back" size={24} color="black" />
         </TouchableOpacity>
         <Text style={styles.headerTitle}>Sugar History</Text>
-        <TouchableOpacity style={styles.filterButton}>
+        <TouchableOpacity
+          style={styles.filterButton}
+          onPress={() => setFilterModalVisible(true)}
+        >
           <Ionicons name="filter-outline" size={20} color="black" />
         </TouchableOpacity>
       </View>
@@ -67,33 +100,72 @@ function SugarHistory({ navigation }) {
       </ScrollView>
 
       <View style={styles.buttonContainer}>
-        <TouchableOpacity style={styles.addButton}>
+        <TouchableOpacity style={styles.addButton} onPress={() => navigation.navigate('RecordSugar')}>
           <Text style={styles.addButtonText}>Add New Record</Text>
         </TouchableOpacity>
       </View>
 
-      {/* <View style={styles.tabBar}>
-        <TouchableOpacity style={styles.tabItem}>
-          <Ionicons name="home-outline" size={22} color="#9e9e9e" />
-          <Text style={styles.tabLabel}>Home</Text>
-        </TouchableOpacity>
-        <TouchableOpacity style={styles.tabItem}>
-          <Ionicons name="restaurant-outline" size={22} color="#9e9e9e" />
-          <Text style={styles.tabLabel}>Meals</Text>
-        </TouchableOpacity>
-        <TouchableOpacity style={styles.tabItem}>
-          <Ionicons name="fitness-outline" size={22} color="#9e9e9e" />
-          <Text style={styles.tabLabel}>Exercise</Text>
-        </TouchableOpacity>
-        <TouchableOpacity style={styles.tabItem}>
-          <Ionicons name="water-outline" size={22} color="#2196F3" />
-          <Text style={[styles.tabLabel, styles.activeTabLabel]}>Sugar</Text>
-        </TouchableOpacity>
-        <TouchableOpacity style={styles.tabItem}>
-          <Ionicons name="bar-chart-outline" size={22} color="#9e9e9e" />
-          <Text style={styles.tabLabel}>Analytics</Text>
-        </TouchableOpacity>
-      </View> */}
+      {/* Filter Modal */}
+      <Modal
+        animationType="slide"
+        transparent={true}
+        visible={isFilterModalVisible}
+        onRequestClose={() => setFilterModalVisible(false)}
+      >
+        <View style={styles.modalBackground}>
+          <View style={styles.modalContainer}>
+            <Text style={styles.modalTitle}>Filter Sugar history</Text>
+
+            <Text style={styles.modalLabel}>From Date</Text>
+            <TouchableOpacity
+              onPress={() => setShowFromDatePicker(true)}
+              style={styles.dateInput}
+            >
+              <Text>{fromDate.toLocaleDateString()}</Text>
+            </TouchableOpacity>
+
+            <Text style={styles.modalLabel}>To Date</Text>
+            <TouchableOpacity
+              onPress={() => setShowToDatePicker(true)}
+              style={styles.dateInput}
+            >
+              <Text>{toDate.toLocaleDateString()}</Text>
+            </TouchableOpacity>
+
+            {showFromDatePicker && (
+              <DateTimePicker
+                value={fromDate}
+                mode="date"
+                display="default"
+                onChange={(event, selectedDate) =>
+                  handleDateChange(event, selectedDate, 'from')
+                }
+              />
+            )}
+
+            {showToDatePicker && (
+              <DateTimePicker
+                value={toDate}
+                mode="date"
+                display="default"
+                onChange={(event, selectedDate) =>
+                  handleDateChange(event, selectedDate, 'to')
+                }
+              />
+            )}
+
+            <Pressable
+              style={styles.modalButton}
+              onPress={() => {
+                // You can implement your filtering logic here
+                setFilterModalVisible(false);
+              }}
+            >
+              <Text style={styles.modalButtonText}>Filter</Text>
+            </Pressable>
+          </View>
+        </View>
+      </Modal>
     </SafeAreaView>
   );
 }
@@ -180,27 +252,50 @@ const styles = StyleSheet.create({
     fontSize: 16,
     fontWeight: '500',
   },
-  tabBar: {
-    flexDirection: 'row',
-    backgroundColor: 'white',
-    paddingBottom: 4,
-    borderTopWidth: 1,
-    borderTopColor: '#e0e0e0',
-    height: 60,
-  },
-  tabItem: {
+  // Modal styles
+  modalBackground: {
     flex: 1,
-    alignItems: 'center',
+    backgroundColor: 'rgba(0, 0, 0, 0.3)',
     justifyContent: 'center',
-    paddingTop: 8,
+    alignItems: 'center',
   },
-  tabLabel: {
-    fontSize: 12,
-    marginTop: 4,
-    color: '#9e9e9e',
+  modalContainer: {
+    backgroundColor: 'white',
+    width: '85%',
+    borderRadius: 16,
+    padding: 20,
+    alignItems: 'center',
   },
-  activeTabLabel: {
-    color: '#2196F3',
+  modalTitle: {
+    fontSize: 18,
+    fontWeight: '600',
+    marginBottom: 20,
+  },
+  modalLabel: {
+    alignSelf: 'flex-start',
+    marginBottom: 6,
+    fontSize: 14,
+  },
+  dateInput: {
+    width: '100%',
+    height: 40,
+    backgroundColor: '#eee',
+    borderRadius: 8,
+    paddingHorizontal: 10,
+    marginBottom: 12,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  modalButton: {
+    marginTop: 10,
+    backgroundColor: '#1875C3',
+    borderRadius: 20,
+    paddingVertical: 10,
+    paddingHorizontal: 20,
+  },
+  modalButtonText: {
+    color: 'white',
+    fontWeight: '600',
   },
 });
 

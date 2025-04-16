@@ -1,18 +1,27 @@
 import React, { useState } from 'react';
-import { View, Text, StyleSheet, TouchableOpacity, Modal, TextInput } from 'react-native';
+import {
+  View,
+  Text,
+  StyleSheet,
+  TouchableOpacity,
+  Modal,
+  TextInput,
+  Platform,
+} from 'react-native';
 import { Calendar } from 'react-native-calendars';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
+import DateTimePicker from '@react-native-community/datetimepicker';
 
 function Calender({ navigation }) {
   const [selectedDate, setSelectedDate] = useState('');
-  const [selectedHour, setSelectedHour] = useState('10');
-  const [selectedMinute, setSelectedMinute] = useState('00');
-  const [selectedMeridiem, setSelectedMeridiem] = useState('AM');
-  const [selectedMealType, setSelectedMealType] = useState('Breakfast');
-  const [modalVisible, setModalVisible] = useState(false);
   const [eventName, setEventName] = useState('');
   const [eventTime, setEventTime] = useState('');
+  const [modalVisible, setModalVisible] = useState(false);
+  const [showDatePicker, setShowDatePicker] = useState(false);
+  const [showTimePicker, setShowTimePicker] = useState(false);
+  const [dateObject, setDateObject] = useState(new Date());
+  const [timeObject, setTimeObject] = useState(new Date());
 
   const appointments = [
     {
@@ -27,12 +36,21 @@ function Calender({ navigation }) {
     },
   ];
 
+  const formatTime = (date) => {
+    let hours = date.getHours();
+    let minutes = date.getMinutes();
+    const ampm = hours >= 12 ? 'PM' : 'AM';
+    hours = hours % 12 || 12;
+    const strTime = `${hours}:${minutes < 10 ? '0' + minutes : minutes} ${ampm}`;
+    return strTime;
+  };
+
   return (
     <SafeAreaView style={styles.container}>
       <TouchableOpacity onPress={() => navigation.goBack()}>
         <Ionicons name="chevron-back" size={24} color="black" />
       </TouchableOpacity>
-      <Text style={styles.header}>Record a Meal</Text>
+      <Text style={styles.header}>Calender</Text>
 
       {/* Calendar */}
       <View style={styles.card}>
@@ -64,7 +82,6 @@ function Calender({ navigation }) {
           }}
           style={styles.calendar}
           onDayPress={(day) => {
-            console.log('Selected date:', day.dateString);
             setSelectedDate(day.dateString);
           }}
         />
@@ -73,7 +90,6 @@ function Calender({ navigation }) {
       {/* Upcoming Appointments */}
       <View style={styles.appointmentsSection}>
         <Text style={styles.appointmentsTitle}>Upcoming Appointments</Text>
-
         {appointments.map((apt, index) => (
           <View key={index} style={styles.appointmentCard}>
             <View>
@@ -84,7 +100,7 @@ function Calender({ navigation }) {
           </View>
         ))}
 
-        {/* Create New Button */}
+        {/* Create New */}
         <TouchableOpacity
           style={styles.createButton}
           onPress={() => setModalVisible(true)}
@@ -94,7 +110,7 @@ function Calender({ navigation }) {
         </TouchableOpacity>
       </View>
 
-      {/* Add Event Modal */}
+      {/* Modal */}
       <Modal
         animationType="slide"
         transparent={true}
@@ -112,19 +128,27 @@ function Calender({ navigation }) {
               onChangeText={setEventName}
             />
 
-            <TextInput
-              style={modalStyles.input}
-              placeholder="Date"
-              value={selectedDate}
-              editable={false}
-            />
+            {/* Date Picker Trigger */}
+            <TouchableOpacity onPress={() => setShowDatePicker(true)}>
+              <TextInput
+                style={modalStyles.input}
+                placeholder="Date"
+                value={selectedDate}
+                editable={false}
+                pointerEvents="none"
+              />
+            </TouchableOpacity>
 
-            <TextInput
-              style={modalStyles.input}
-              placeholder="Time"
-              value={eventTime}
-              onChangeText={setEventTime}
-            />
+            {/* Time Picker Trigger */}
+            <TouchableOpacity onPress={() => setShowTimePicker(true)}>
+              <TextInput
+                style={modalStyles.input}
+                placeholder="Time"
+                value={eventTime}
+                editable={false}
+                pointerEvents="none"
+              />
+            </TouchableOpacity>
 
             <View style={modalStyles.buttonRow}>
               <TouchableOpacity
@@ -132,25 +156,68 @@ function Calender({ navigation }) {
                 onPress={() => {
                   setEventName('');
                   setEventTime('');
+                  setSelectedDate('');
                   setModalVisible(false);
                 }}
               >
-                <Text style={{ color: '#1875C3',marginTop: '5',fontWeight:'600' }}>Delete</Text>
+                <Text style={{ color: '#1875C3', marginTop: 5, fontWeight: '600' }}>
+                  Delete
+                </Text>
               </TouchableOpacity>
 
               <TouchableOpacity
                 style={modalStyles.saveButton}
                 onPress={() => {
-                  console.log('Saved Event:', { eventName, selectedDate, eventTime });
+                  console.log('Saved Event:', {
+                    eventName,
+                    selectedDate,
+                    eventTime,
+                  });
                   setModalVisible(false);
                 }}
               >
-                <Text style={{ color: '#fff',marginTop: '5',fontWeight:'600' }}>Save</Text>
+                <Text style={{ color: '#fff', marginTop: 5, fontWeight: '600' }}>
+                  Save
+                </Text>
               </TouchableOpacity>
             </View>
           </View>
         </View>
       </Modal>
+
+      {/* Date Picker */}
+      {showDatePicker && (
+        <DateTimePicker
+          value={dateObject}
+          mode="date"
+          display={Platform.OS === 'ios' ? 'spinner' : 'default'}
+          onChange={(event, selected) => {
+            setShowDatePicker(false);
+            if (selected) {
+              const isoDate = selected.toISOString().split('T')[0];
+              setDateObject(selected);
+              setSelectedDate(isoDate);
+            }
+          }}
+        />
+      )}
+
+      {/* Time Picker */}
+      {showTimePicker && (
+        <DateTimePicker
+          value={timeObject}
+          mode="time"
+          is24Hour={false}
+          display={Platform.OS === 'ios' ? 'spinner' : 'default'}
+          onChange={(event, selected) => {
+            setShowTimePicker(false);
+            if (selected) {
+              setTimeObject(selected);
+              setEventTime(formatTime(selected));
+            }
+          }}
+        />
+      )}
     </SafeAreaView>
   );
 }
@@ -292,6 +359,7 @@ const modalStyles = StyleSheet.create({
     borderRadius: 30,
     width: '45%',
     alignItems: 'center',
+    height: 50,
   },
 });
 
