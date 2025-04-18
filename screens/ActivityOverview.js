@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { View, Text, StyleSheet, TouchableOpacity, ScrollView, Dimensions } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
@@ -8,7 +7,7 @@ import { LineChart } from 'react-native-gifted-charts';
 function ActivityOverview({ navigation }) {
   const [timeframe, setTimeframe] = useState('week');
 
-  const screenWidth = Dimensions.get('window').width - 40;
+  const screenWidth = Dimensions.get('window').width - 70;
 
   // Chart data for react-native-gifted-charts
   const lineData = [
@@ -19,6 +18,34 @@ function ActivityOverview({ navigation }) {
     { value: 350, label: 'THU' },
     { value: 330, label: 'FRI' },
     { value: 300, label: 'SAT' },
+  ];
+
+  // Sample data for calorie and sugar chart (replace these with real data)
+  const calorieData = [
+    { value: 150, label: 'SUN' },
+    { value: 200, label: 'MON' },
+    { value: 250, label: 'TUE' },
+    { value: 220, label: 'WED' },
+    { value: 280, label: 'THU' },
+    { value: 300, label: 'FRI' },
+    { value: 270, label: 'SAT' },
+  ];
+
+  const sugarData = [
+    { value: 50, label: 'SUN' },
+    { value: 60, label: 'MON' },
+    { value: 70, label: 'TUE' },
+    { value: 65, label: 'WED' },
+    { value: 75, label: 'THU' },
+    { value: 80, label: 'FRI' },
+    { value: 55, label: 'SAT' },
+  ];
+
+  const calorieMonthData = [
+    { value: 1500, label: 'Week 1' },
+    { value: 1800, label: 'Week 2' },
+    { value: 2000, label: 'Week 3' },
+    { value: 1700, label: 'Week 4' },
   ];
 
   const activityData = [
@@ -59,45 +86,74 @@ function ActivityOverview({ navigation }) {
         <Text style={styles.caloriesTitle}>Calories Burned</Text>
         <Text style={styles.caloriesTotal}>1,840 kcal</Text>
 
-        <View style={styles.chartContainer}>
-          <Text style={styles.chartHighlight}>300kcal</Text>
-          <LineChart
-            data={lineData}
-            width={screenWidth}
-            height={180}
-            spacing={(screenWidth - 20) / (lineData.length - 1)} // Adjust spacing based on data
-            initialSpacing={10}
-            color="#1875C3"
-            thickness={2}
-            maxValue={400}
-            noOfSections={4}
-            curved
-            hideDataPoints
-            yAxisColor="transparent"
-            xAxisColor="lightgray"
-            yAxisTextStyle={{ color: 'gray' }}
-            xAxisLabelTextStyle={{ color: 'gray', fontSize: 10 }}
-            yAxisTextNumberOfLines={1}
-            yAxisLabelWidth={0}
-            hideYAxisText
-            rulesColor="rgba(200, 200, 200, 0.6)"
-            rulesType="dashed"
-            xAxisIndicesHeight={10}
-            customDataPoint={() => null}
-            pointerConfig={{
-              pointerStripHeight: 160,
-              pointerStripColor: 'lightgray',
-              pointerStripWidth: 2,
-              pointerColor: '#1875C3',
-              radius: 6,
-              pointerLabelWidth: 100,
-              pointerLabelHeight: 90,
-              pointerLabelComponent: () => null,
-              activatePointersOnLongPress: false,
-              autoAdjustPointerLabelPosition: false,
-              stripOverPointer: true,
-            }}
-          />
+        <View style={styles.caloriesSection}>
+          {timeframe === 'week' ? (
+            <LineChart
+              width={screenWidth}
+              height={180}
+              spacing={(screenWidth - 20) / (calorieData.length - 1)}
+              initialSpacing={10}
+              maxValue={400}
+              noOfSections={4}
+              yAxisColor="transparent"
+              xAxisColor="lightgray"
+              yAxisTextStyle={{ color: 'gray' }}
+              xAxisLabelTextStyle={{ color: 'gray', fontSize: 10 }}
+              yAxisLabelWidth={0}
+              hideYAxisText
+              rulesColor="rgba(200, 200, 200, 0.6)"
+              rulesType="dashed"
+              xAxisIndicesHeight={10}
+              data={calorieData}
+              data2={sugarData}
+              data2Color="#F47174"
+              color="#40B4F7"
+              thickness={2}
+              data2Thickness={2}
+              curved
+              showDataPoint
+              dataPointColor="#40B4F7"
+              dataPointRadius={4}
+              data2PointColor="#F47174"
+              data2PointRadius={4}
+              showStripOnDataPoint
+              stripColor="lightgray"
+              stripHeight={160}
+            />
+          ) : (
+            <LineChart
+              width={screenWidth}
+              height={180}
+              spacing={(screenWidth - 20) / (calorieMonthData.length - 1)}
+              initialSpacing={10}
+              maxValue={2500}
+              noOfSections={4}
+              yAxisColor="transparent"
+              xAxisColor="lightgray"
+              yAxisTextStyle={{ color: 'gray' }}
+              xAxisLabelTextStyle={{ color: 'gray', fontSize: 10 }}
+              yAxisLabelWidth={0}
+              hideYAxisText
+              rulesColor="rgba(200, 200, 200, 0.6)"
+              rulesType="dashed"
+              xAxisIndicesHeight={10}
+              data={calorieMonthData}
+              data2={sugarData}
+              data2Color="#F47174"
+              color="#40B4F7"
+              thickness={2}
+              data2Thickness={2}
+              curved
+              showDataPoint
+              dataPointColor="#40B4F7"
+              dataPointRadius={4}
+              data2PointColor="#F47174"
+              data2PointRadius={4}
+              showStripOnDataPoint
+              stripColor="lightgray"
+              stripHeight={160}
+            />
+          )}
         </View>
       </View>
 
@@ -131,29 +187,6 @@ function ActivityOverview({ navigation }) {
           ))}
         </ScrollView>
       </View>
-
-      {/* <View style={styles.tabBar}>
-        <TouchableOpacity style={styles.tabItem}>
-          <Ionicons name="home-outline" size={24} color="#888" />
-          <Text style={styles.tabText}>Home</Text>
-        </TouchableOpacity>
-        <TouchableOpacity style={styles.tabItem}>
-          <Ionicons name="restaurant-outline" size={24} color="#888" />
-          <Text style={styles.tabText}>Meals</Text>
-        </TouchableOpacity>
-        <TouchableOpacity style={styles.tabItem}>
-          <Ionicons name="bicycle" size={24} color="#4169E1" />
-          <Text style={[styles.tabText, styles.tabTextActive]}>Exercise</Text>
-        </TouchableOpacity>
-        <TouchableOpacity style={styles.tabItem}>
-          <Ionicons name="water-outline" size={24} color="#888" />
-          <Text style={styles.tabText}>Water</Text>
-        </TouchableOpacity>
-        <TouchableOpacity style={styles.tabItem}>
-          <Ionicons name="stats-chart-outline" size={24} color="#888" />
-          <Text style={styles.tabText}>Analytics</Text>
-        </TouchableOpacity>
-      </View> */}
     </SafeAreaView>
   );
 }
@@ -185,7 +218,6 @@ const styles = StyleSheet.create({
     paddingHorizontal: 16,
     borderRadius: 20,
     marginHorizontal: 6,
-
   },
   timeframeButtonActive: {
     backgroundColor: '#1875C3',
@@ -214,18 +246,6 @@ const styles = StyleSheet.create({
     textAlign: 'center',
     color: '#333',
     marginTop: 4,
-  },
-  chartContainer: {
-    marginTop: 16,
-    position: 'relative',
-  },
-  chartHighlight: {
-    position: 'absolute',
-    top: 40,
-    right: 60,
-    color: '#1875C3',
-    fontWeight: '600',
-    zIndex: 1,
   },
   summaryContainer: {
     flex: 1,
@@ -294,25 +314,6 @@ const styles = StyleSheet.create({
   caloriesBurned: {
     fontSize: 12,
     color: '#888',
-  },
-  tabBar: {
-    flexDirection: 'row',
-    backgroundColor: 'white',
-    paddingVertical: 10,
-    borderTopWidth: 1,
-    borderTopColor: '#eee',
-    justifyContent: 'space-around',
-  },
-  tabItem: {
-    alignItems: 'center',
-  },
-  tabText: {
-    fontSize: 12,
-    marginTop: 4,
-    color: '#888',
-  },
-  tabTextActive: {
-    color: '#4169E1',
   },
 });
 

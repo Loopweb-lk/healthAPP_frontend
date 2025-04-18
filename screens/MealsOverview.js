@@ -13,7 +13,7 @@ import { LineChart } from 'react-native-gifted-charts';
 
 function MealsOverview({ navigation }) {
     const [timeframe, setTimeframe] = useState('week');
-    const screenWidth = Dimensions.get('window').width - 40;
+    const screenWidth = Dimensions.get('window').width - 30;
 
     const calorieData = [
         { value: 30, label: 'SUN' },
@@ -119,38 +119,73 @@ function MealsOverview({ navigation }) {
             </View>
 
             <View style={styles.caloriesSection}>
-                <LineChart
-                    width={screenWidth}
-                    height={180}
-                    spacing={(screenWidth - 20) / (calorieData.length - 1)}
-                    initialSpacing={10}
-                    maxValue={200}
-                    noOfSections={4}
-                    yAxisColor="transparent"
-                    xAxisColor="lightgray"
-                    yAxisTextStyle={{ color: 'gray' }}
-                    xAxisLabelTextStyle={{ color: 'gray', fontSize: 10 }}
-                    yAxisLabelWidth={0}
-                    hideYAxisText
-                    rulesColor="rgba(200, 200, 200, 0.6)"
-                    rulesType="dashed"
-                    xAxisIndicesHeight={10}
-                    data={timeframe === 'week' ? calorieData : calorieMonthData}
-                    data2={sugarData}
-                    data2Color="#F47174"
-                    color="#40B4F7"
-                    thickness={2}
-                    data2Thickness={2}
-                    curved
-                    showDataPoint
-                    dataPointColor="#40B4F7"
-                    dataPointRadius={4}
-                    data2PointColor="#F47174"
-                    data2PointRadius={4}
-                    showStripOnDataPoint
-                    stripColor="lightgray"
-                    stripHeight={160}
-                />
+                {timeframe === 'week' ? (
+                    <LineChart
+                        width={screenWidth}
+                        height={180}
+                        spacing={(screenWidth - 20) / (calorieData.length - 1)}
+                        initialSpacing={10}
+                        maxValue={200}
+                        noOfSections={4}
+                        yAxisColor="transparent"
+                        xAxisColor="lightgray"
+                        yAxisTextStyle={{ color: 'gray' }}
+                        xAxisLabelTextStyle={{ color: 'gray', fontSize: 10 }}
+                        yAxisLabelWidth={0}
+                        hideYAxisText
+                        rulesColor="rgba(200, 200, 200, 0.6)"
+                        rulesType="dashed"
+                        xAxisIndicesHeight={10}
+                        data={calorieData}
+                        data2={sugarData}
+                        data2Color="#F47174"
+                        color="#40B4F7"
+                        thickness={2}
+                        data2Thickness={2}
+                        curved
+                        showDataPoint
+                        dataPointColor="#40B4F7"
+                        dataPointRadius={4}
+                        data2PointColor="#F47174"
+                        data2PointRadius={4}
+                        showStripOnDataPoint
+                        stripColor="lightgray"
+                        stripHeight={160}
+                    />
+                ) : (
+                    <LineChart
+                        width={screenWidth}
+                        height={180}
+                        spacing={(screenWidth - 20) / (calorieData.length - 1)}
+                        initialSpacing={10}
+                        maxValue={200}
+                        noOfSections={4}
+                        yAxisColor="transparent"
+                        xAxisColor="lightgray"
+                        yAxisTextStyle={{ color: 'gray' }}
+                        xAxisLabelTextStyle={{ color: 'gray', fontSize: 10 }}
+                        yAxisLabelWidth={0}
+                        hideYAxisText
+                        rulesColor="rgba(200, 200, 200, 0.6)"
+                        rulesType="dashed"
+                        xAxisIndicesHeight={10}
+                        data={calorieMonthData}
+                        data2={sugarData}
+                        data2Color="#F47174"
+                        color="#40B4F7"
+                        thickness={2}
+                        data2Thickness={2}
+                        curved
+                        showDataPoint
+                        dataPointColor="#40B4F7"
+                        dataPointRadius={4}
+                        data2PointColor="#F47174"
+                        data2PointRadius={4}
+                        showStripOnDataPoint
+                        stripColor="lightgray"
+                        stripHeight={160}
+                    />
+                )}
             </View>
 
             <View style={styles.row}>
