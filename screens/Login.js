@@ -30,7 +30,7 @@ function Login({ navigation }) {
     };
 
     const login = () => {
-        navigation.navigate('MealsOverview');
+        navigation.navigate('BottomTabNavigation');
 
         // const endpoint = '/api/auth/login';
 
