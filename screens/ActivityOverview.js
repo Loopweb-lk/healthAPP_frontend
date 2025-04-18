@@ -62,7 +62,7 @@ function ActivityOverview({ navigation }) {
           <Ionicons name="chevron-back" size={24} color="black" />
         </TouchableOpacity>
         <Text style={styles.headerTitle}>Activity Overview</Text>
-        <TouchableOpacity>
+        <TouchableOpacity onPress={() => navigation.navigate('MealsOverview')}>
           <Ionicons name="chevron-forward" size={24} color="black" />
         </TouchableOpacity>
       </View>
