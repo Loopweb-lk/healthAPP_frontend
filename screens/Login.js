@@ -30,7 +30,7 @@ function Login({ navigation }) {
     };
 
     const login = () => {
-        navigation.navigate('UserProfile');
+        navigation.navigate('Notifications');
 
         // const endpoint = '/api/auth/login';
 

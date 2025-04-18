@@ -26,6 +26,8 @@ import Calender from './screens/Calender';
 import SugarHistory from './screens/SugarHistory';
 import RecordSugar from './screens/RecordSugar';
 import UserProfile from './screens/UserProfile';
+import MealsOverview from './screens/MealsOverview';
+import Notifications from './screens/Notifications';
 
 // Prevent SplashScreen from auto-hiding until ready
 SplashScreen.preventAutoHideAsync();
@@ -108,6 +110,9 @@ export default function App() {
             <Stack.Screen name="SugarHistory" component={SugarHistory} />
             <Stack.Screen name="RecordSugar" component={RecordSugar} />
             <Stack.Screen name="UserProfile" component={UserProfile} />
+            <Stack.Screen name="MealsOverview" component={MealsOverview} />
+            <Stack.Screen name="Notifications" component={Notifications} />
+
 
           </>
         )}

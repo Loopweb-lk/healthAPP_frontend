@@ -7,9 +7,9 @@ import { LineChart } from 'react-native-gifted-charts';
 
 function ActivityOverview({ navigation }) {
   const [timeframe, setTimeframe] = useState('week');
-  
+
   const screenWidth = Dimensions.get('window').width - 40;
-  
+
   // Chart data for react-native-gifted-charts
   const lineData = [
     { value: 150, label: 'SUN' },
@@ -20,12 +20,12 @@ function ActivityOverview({ navigation }) {
     { value: 330, label: 'FRI' },
     { value: 300, label: 'SAT' },
   ];
-  
+
   const activityData = [
-    { day: 'Monday', activities: [{type: 'Running', duration: '30 Minutes', calories: 50}, {type: 'Yoga', duration: '20 Minutes', calories: 50}] },
-    { day: 'Tuesday', activities: [{type: 'Running', duration: '40 Minutes', calories: 50}] },
-    { day: 'Wednesday', activities: [{type: 'Running', duration: '35 Minutes', calories: 50}] },
-    { day: 'Friday', activities: [{type: 'Cycling', duration: '30 Minutes', calories: 25}, {type: 'Yoga', duration: '25 Minutes', calories: 55}] },
+    { day: 'Monday', activities: [{ type: 'Running', duration: '30 Minutes', calories: 50 }, { type: 'Yoga', duration: '20 Minutes', calories: 50 }] },
+    { day: 'Tuesday', activities: [{ type: 'Running', duration: '40 Minutes', calories: 50 }] },
+    { day: 'Wednesday', activities: [{ type: 'Running', duration: '35 Minutes', calories: 50 }] },
+    { day: 'Friday', activities: [{ type: 'Cycling', duration: '30 Minutes', calories: 25 }, { type: 'Yoga', duration: '25 Minutes', calories: 55 }] },
   ];
 
   return (
@@ -41,14 +41,14 @@ function ActivityOverview({ navigation }) {
       </View>
 
       <View style={styles.timeframeSelector}>
-        <TouchableOpacity 
-          style={[styles.timeframeButton, timeframe === 'week' && styles.timeframeButtonActive]} 
+        <TouchableOpacity
+          style={[styles.timeframeButton, timeframe === 'week' && styles.timeframeButtonActive]}
           onPress={() => setTimeframe('week')}
         >
           <Text style={[styles.timeframeText, timeframe === 'week' && styles.timeframeTextActive]}>This week</Text>
         </TouchableOpacity>
-        <TouchableOpacity 
-          style={[styles.timeframeButton, timeframe === 'month' && styles.timeframeButtonActive]} 
+        <TouchableOpacity
+          style={[styles.timeframeButton, timeframe === 'month' && styles.timeframeButtonActive]}
           onPress={() => setTimeframe('month')}
         >
           <Text style={[styles.timeframeText, timeframe === 'month' && styles.timeframeTextActive]}>This Month</Text>
@@ -58,14 +58,14 @@ function ActivityOverview({ navigation }) {
       <View style={styles.caloriesSection}>
         <Text style={styles.caloriesTitle}>Calories Burned</Text>
         <Text style={styles.caloriesTotal}>1,840 kcal</Text>
-        
+
         <View style={styles.chartContainer}>
           <Text style={styles.chartHighlight}>300kcal</Text>
           <LineChart
             data={lineData}
             width={screenWidth}
             height={180}
-            spacing={screenWidth / 8}
+            spacing={(screenWidth - 20) / (lineData.length - 1)} // Adjust spacing based on data
             initialSpacing={10}
             color="#1875C3"
             thickness={2}
@@ -75,8 +75,8 @@ function ActivityOverview({ navigation }) {
             hideDataPoints
             yAxisColor="transparent"
             xAxisColor="lightgray"
-            yAxisTextStyle={{color: 'gray'}}
-            xAxisLabelTextStyle={{color: 'gray', fontSize: 10}}
+            yAxisTextStyle={{ color: 'gray' }}
+            xAxisLabelTextStyle={{ color: 'gray', fontSize: 10 }}
             yAxisTextNumberOfLines={1}
             yAxisLabelWidth={0}
             hideYAxisText
@@ -110,11 +110,11 @@ function ActivityOverview({ navigation }) {
               {dayData.activities.map((activity, activityIndex) => (
                 <View key={activityIndex} style={styles.activityItem}>
                   <View style={styles.activityIconContainer}>
-                    <Ionicons 
-                      name={activity.type === 'Running' ? 'walk-outline' : 
-                           activity.type === 'Cycling' ? 'bicycle-outline' : 'body-outline'} 
-                      size={20} 
-                      color="white" 
+                    <Ionicons
+                      name={activity.type === 'Running' ? 'walk-outline' :
+                        activity.type === 'Cycling' ? 'bicycle-outline' : 'body-outline'}
+                      size={20}
+                      color="white"
                     />
                   </View>
                   <View style={styles.activityDetails}>
@@ -185,7 +185,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: 16,
     borderRadius: 20,
     marginHorizontal: 6,
-    
+
   },
   timeframeButtonActive: {
     backgroundColor: '#1875C3',
@@ -220,7 +220,7 @@ const styles = StyleSheet.create({
     position: 'relative',
   },
   chartHighlight: {
-    position: 'absolute', 
+    position: 'absolute',
     top: 40,
     right: 60,
     color: '#1875C3',
@@ -238,7 +238,7 @@ const styles = StyleSheet.create({
     paddingTop: 20,
     marginRight: 25,
     marginLeft: 25,
-    marginBottom: 20,   
+    marginBottom: 20,
   },
   summaryTitle: {
     fontSize: 18,
