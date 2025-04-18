@@ -12,6 +12,7 @@ import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
 import { COLORS } from "../constants";
 import { Create, Home, Meals, Profile, Settings } from "../screens";
 import Feather from "react-native-vector-icons/Feather"; // Import Feather icons
+import ActivityOverview from "../screens/ActivityOverview";
 
 const Tab = createBottomTabNavigator();
 
@@ -250,8 +251,8 @@ const BottomTabNav = () => {
       />
 
       <Tab.Screen
-        name="Profile"
-        component={Profile}
+        name="ActivityOverview"
+        component={ActivityOverview}
         options={{
           tabBarIcon: ({ focused }) => (
             <View

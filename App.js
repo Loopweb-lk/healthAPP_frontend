@@ -10,13 +10,24 @@ import BottomTabNav from './navigations/BottomTabNav';
 import Welcome from './Welcome';
 import Login from './screens/Login';
 import Register from './screens/Register';
-import { EditProfile } from './screens';
+import { EditProfile, Meals } from './screens';
 import ResetPassword from './screens/Resetpassword';
 import EmergencyContacts from './screens/EmergencyContacts';
 import MealPlanner from './screens/MealPlanner';
 import EnterMealItems from './screens/EnterMealItems';
 import RecordMeal from './screens/RecordMeal';
 import GroceryList from './screens/GroceryList';
+import Walking from './screens/Walking';
+import WalkingTrackEnd from './screens/WalkingTrackEnd';
+import ActivityOverview from './screens/ActivityOverview';
+import Add_New_Meal_ltem from './screens/Add_New_Meal_ltem';
+import EnterActivityTime from './screens/EnterActivityTime';
+import Calender from './screens/Calender';
+import SugarHistory from './screens/SugarHistory';
+import RecordSugar from './screens/RecordSugar';
+import UserProfile from './screens/UserProfile';
+import MealsOverview from './screens/MealsOverview';
+import Notifications from './screens/Notifications';
 
 // Prevent SplashScreen from auto-hiding until ready
 SplashScreen.preventAutoHideAsync();
@@ -85,10 +96,24 @@ export default function App() {
             <Stack.Screen name="ResetPassword" component={ResetPassword} />
             <Stack.Screen name="EmergencyContacts" component={EmergencyContacts} />
             <Stack.Screen name="MealPlanner" component={MealPlanner} />
+            <Stack.Screen name="Meals" component={Meals} />
             <Stack.Screen name="EnterMealItems" component={EnterMealItems} />
             <Stack.Screen name="EditProfile" component={EditProfile} />
             <Stack.Screen name="RecordMeal" component={RecordMeal} />
             <Stack.Screen name="GroceryList" component={GroceryList} />
+            <Stack.Screen name="Walking" component={Walking} />
+            <Stack.Screen name="WalkingTrackEnd" component={WalkingTrackEnd} />
+            <Stack.Screen name="ActivityOverview" component={ActivityOverview} />
+            <Stack.Screen name="Add_New_Meal_ltem" component={Add_New_Meal_ltem} />
+            <Stack.Screen name="EnterActivityTime" component={EnterActivityTime} />
+            <Stack.Screen name="Calender" component={Calender} />
+            <Stack.Screen name="SugarHistory" component={SugarHistory} />
+            <Stack.Screen name="RecordSugar" component={RecordSugar} />
+            <Stack.Screen name="UserProfile" component={UserProfile} />
+            <Stack.Screen name="MealsOverview" component={MealsOverview} />
+            <Stack.Screen name="Notifications" component={Notifications} />
+
+
           </>
         )}
         

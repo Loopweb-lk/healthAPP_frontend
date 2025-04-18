@@ -1,5 +1,5 @@
 class ApiServer {
-    static baseServer = 'https://easy-yak-unique.ngrok-free.app';
+    static baseServer = 'https://rare-heartily-bunny.ngrok-free.app';
 
     static call(endpoint, method = 'GET', body = null) {
 

@@ -3,7 +3,8 @@ import React, { useState } from 'react';
 import { Feather, Ionicons } from '@expo/vector-icons';
 import DateTimePicker from '@react-native-community/datetimepicker';
 
-const Meals = () => {
+function Meals({ navigation }) {
+
   const [modalVisible, setModalVisible] = useState(false);
   const [fromDate, setFromDate] = useState(new Date());
   const [toDate, setToDate] = useState(new Date());
@@ -258,7 +259,7 @@ const Meals = () => {
                 borderColor: 'rgba(24, 117, 195, 1)',
                 width: '100%'
               }}
-              onPress={() => navigation.navigate('BottomTabNavigation')}
+              onPress={() => navigation.navigate('EnterMealItems')}
             >
               <Text style={{ color: 'rgba(24, 117, 195, 1)', fontSize: 16 }}>Record New Template</Text>
             </TouchableOpacity>

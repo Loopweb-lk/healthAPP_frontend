@@ -43,7 +43,7 @@ function Home({ navigation }) {
 
   const SettingsPopup = () => (
     <View style={styles.settingsPopup}>
-      <TouchableOpacity style={styles.settingsItem}>
+      <TouchableOpacity style={styles.settingsItem} onPress={() => navigation.navigate('UserProfile')}>
         <Text style={styles.settingsText}>Your Profile</Text>
       </TouchableOpacity>
       {/* <TouchableOpacity style={styles.settingsItem}>

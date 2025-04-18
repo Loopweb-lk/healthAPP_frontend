@@ -30,27 +30,29 @@ function Login({ navigation }) {
     };
 
     const login = () => {
-        const endpoint = '/api/auth/login';
+        navigation.navigate('BottomTabNavigation');
 
-        const body = {
-            username: formData.email,
-            password: formData.password,
-        }
+        // const endpoint = '/api/auth/login';
 
-        ApiServer.call(endpoint, 'POST', body)
-            .then(data => {
-                if (data.message == "Login successful") {
-                    navigation.navigate('BottomTabNavigation');
-                    Alert.alert('Login successful', data.message);
-                }else{
-                    Alert.alert('Login failed', data.message);
-                }
-            })
-            .catch(error => {
-                console.error('Login failed:', error);
-                Alert.alert('Login failed', data.message);
+        // const body = {
+        //     username: formData.email,
+        //     password: formData.password,
+        // }
 
-            });
+        // ApiServer.call(endpoint, 'POST', body)
+        //     .then(data => {
+        //         if (data.message == "Login successful") {
+        //             navigation.navigate('BottomTabNavigation');
+        //             Alert.alert('Login successful', data.message);
+        //         }else{
+        //             Alert.alert('Login failed', data.message);
+        //         }
+        //     })
+        //     .catch(error => {
+        //         console.error('Login failed:', error);
+        //         Alert.alert('Login failed', data.message);
+
+        //     });
     }
 
     return (
@@ -112,7 +114,7 @@ function Login({ navigation }) {
                     {/* Register Link */}
                     <View style={styles.loginContainer}>
                         <Text style={styles.loginText}>Don't have an account? </Text>
-                        <TouchableOpacity onPress={() => navigation.navigate('GroceryList')}>
+                        <TouchableOpacity onPress={() => navigation.navigate('Register')}>
                             <Text style={styles.loginLink}>Register</Text>
                         </TouchableOpacity>
                     </View>
