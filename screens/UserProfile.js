@@ -200,7 +200,7 @@ function UserProfile({ navigation }) {
                   mode="date"
                   display={Platform.OS === 'ios' ? "spinner" : "default"}
                   onChange={onDateChange}
-                  style={Platform.OS === 'ios' ? styles.datePickerIOS : null}
+                  style={{backgroundColor:'black'}}
                 />
               )}
             </View>
