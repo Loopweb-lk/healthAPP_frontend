@@ -6,6 +6,8 @@ import {
     TouchableOpacity,
     SafeAreaView,
     StyleSheet,
+    TouchableWithoutFeedback,
+    Modal,
     ScrollView
 } from 'react-native';
 import { Feather } from '@expo/vector-icons';
@@ -13,9 +15,11 @@ import { createStackNavigator } from '@react-navigation/stack';
 import { NavigationContainer } from '@react-navigation/native';
 import { createStaticNavigation, useNavigation, } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
-import Welcome from '../Welcome';  // Adjust path as needed
+import Welcome from '../Welcome';
 import Login from './Login';
 import ApiServer from './../Services/ApiServer';
+import { Picker } from '@react-native-picker/picker';
+import { types } from '@babel/core';
 
 function Register({ navigation }) {
 
@@ -23,9 +27,17 @@ function Register({ navigation }) {
         fullName: '',
         email: '',
         password: '',
+        CBG: '',
+        CIG: ''
     });
     const [showPassword, setShowPassword] = useState(false);
     const [acceptedTerms, setAcceptedTerms] = useState(false);
+    const [selectedOption, setSelectedOption] = useState('');
+    const [isDropdownOpen, setIsDropdownOpen] = useState(false);
+
+    const toggleDropdown = () => {
+        setIsDropdownOpen(!isDropdownOpen);
+    };
 
     const validatePassword = (password) => {
         const conditions = [
@@ -43,6 +55,9 @@ function Register({ navigation }) {
             username: formData.fullName,
             email: formData.email,
             password: formData.password,
+            type: selectedOption,
+            CIG: formData.CIG,
+            CBG: formData.CBG,
         }
 
         ApiServer.call(endpoint, 'POST', body)
@@ -76,7 +91,6 @@ function Register({ navigation }) {
                         </View>
                     </View>
 
-                    {/* Email Input */}
                     <View style={styles.inputContainer}>
                         <Text style={styles.label}>E-mail</Text>
                         <View style={styles.inputWrapper}>
@@ -89,6 +103,65 @@ function Register({ navigation }) {
                                 onChangeText={(text) => setFormData({ ...formData, email: text })}
                             />
                         </View>
+                    </View>
+
+                    <View style={styles.inputContainer}>
+                        <Text style={styles.label}>Daily Calorie Intake Goal(cal)</Text>
+                        <View style={styles.inputWrapper}>
+                            <Feather name="target" size={20} color="#666" style={styles.icon} />
+                            <TextInput
+                                style={styles.input}
+                                placeholder="Enter your calorie intake goal here"
+                                value={formData.CIG}
+                                onChangeText={(text) => setFormData({ ...formData, CIG: text })}
+                            />
+                        </View>
+                    </View>
+
+                    <View style={styles.inputContainer}>
+                        <Text style={styles.label}>Daily calorie burn out goal(cal)</Text>
+                        <View style={styles.inputWrapper}>
+                            <Feather name="target" size={20} color="#666" style={styles.icon} />
+                            <TextInput
+                                style={styles.input}
+                                placeholder="Enter your calorie burn out goal here"
+                                value={formData.CBG}
+                                onChangeText={(text) => setFormData({ ...formData, CBG: text })}
+                            />
+                        </View>
+                    </View>
+
+                    <View style={styles.inputContainer}>
+                        <Text style={styles.label}>Meal Option</Text>
+                        <View style={styles.inputWrapper}>
+                            <Feather name="coffee" size={20} color="#666" style={styles.icon} />
+                            <TouchableOpacity onPress={toggleDropdown} style={styles.input}>
+                                <Text style={styles.placeholderText}>
+                                    {selectedOption ? selectedOption : 'Select Option'}
+                                </Text>
+                            </TouchableOpacity>
+                        </View>
+
+                        {isDropdownOpen && (
+                            <>
+                                <TouchableWithoutFeedback onPress={() => setIsDropdownOpen(false)}>
+                                    <View style={styles.overlay}></View>
+                                </TouchableWithoutFeedback>
+                                <View style={styles.dropdownContainer}>
+                                    <Picker
+                                        selectedValue={selectedOption}
+                                        style={styles.picker}
+                                        onValueChange={(itemValue) => {
+                                            setSelectedOption(itemValue);
+                                            setIsDropdownOpen(false);
+                                        }}
+                                    >
+                                        <Picker.Item label="Veg" value="veg" />
+                                        <Picker.Item label="Non-veg" value="non-veg" />
+                                    </Picker>
+                                </View>
+                            </>
+                        )}
                     </View>
 
                     {/* Password Input */}
@@ -190,6 +263,28 @@ const styles = StyleSheet.create({
     container: {
         flex: 1,
         backgroundColor: 'rgba(245, 245, 248, 1)',
+    },
+    inputContainer: {
+        marginBottom: 20, // Custom margin for the container
+    },
+    label: {
+        fontSize: 16, // Custom font size for the label
+        color: '#333', // Custom text color for the label
+        marginBottom: 8, // Custom margin for the label to separate it from the input
+    },
+    inputWrapper: {
+        flexDirection: 'row', // Ensures the icon and input are in a row
+        alignItems: 'center', // Vertically aligns the icon and input in the center
+        borderBottomWidth: 1, // Adds a border at the bottom of the input field
+        borderBottomColor: '#ccc', // Sets the border color to light gray
+    },
+    icon: {
+        marginRight: 10, // Custom margin between the icon and the input field
+    },
+    input: {
+        flex: 1, // Ensures the input takes up available space
+        padding: 10, // Custom padding inside the input field
+        fontSize: 16, // Custom font size for the input text
     },
     content: {
         padding: 24,

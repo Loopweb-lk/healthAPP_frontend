@@ -10,25 +10,34 @@ import {
 import { Feather, Ionicons } from '@expo/vector-icons';
 import { COLORS } from '../constants';
 import ApiServer from './../Services/ApiServer';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 function MealPlanner({ navigation }) {
 
     const [mealData, setMealData] = useState({});
     const [MealIDs, setMealIDs] = useState(null);
 
-    useEffect(() => {
-        const endpoint = '/api/meal/getMeals';
 
-        ApiServer.call(endpoint, 'GET')
-            .then(data => {
+    useEffect(() => {
+        const fetchMeals = async () => {
+            try {
+                const endpoint = '/api/meal/getMeals';
+                const token = await AsyncStorage.getItem('token');
+                const headers = {
+                    Authorization: `Bearer ${token}`
+                }
+                const data = await ApiServer.call(endpoint, 'GET', null, headers);
                 setMealData(data.mealPlan);
                 setMealIDs(extractMealIds(data));
-            })
-            .catch(error => {
+            } catch (error) {
                 console.error('Login failed:', error);
                 Alert.alert('Login failed', error.message);
-            });
+            }
+        };
+
+        fetchMeals();
     }, []);
+
 
     const renderMealCard = (type, meal) => (
         <View style={styles.mealCard} key={`${meal.name}-${meal.calorie}-${type}`}>

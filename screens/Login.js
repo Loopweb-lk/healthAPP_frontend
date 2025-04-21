@@ -12,6 +12,7 @@ import {
 } from 'react-native';
 import { Feather } from '@expo/vector-icons';
 import ApiServer from './../Services/ApiServer';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 function Login({ navigation }) {
 
@@ -29,30 +30,28 @@ function Login({ navigation }) {
         navigation.navigate('ResetPassword')
     };
 
-    const login = () => {
-        navigation.navigate('BottomTabNavigation');
+    const login = async () => {
+        const endpoint = '/api/auth/login';
 
-        // const endpoint = '/api/auth/login';
+        const body = {
+            username: formData.email,
+            password: formData.password,
+        }
 
-        // const body = {
-        //     username: formData.email,
-        //     password: formData.password,
-        // }
+        try {
+            const data = await ApiServer.call(endpoint, 'POST', body);
 
-        // ApiServer.call(endpoint, 'POST', body)
-        //     .then(data => {
-        //         if (data.message == "Login successful") {
-        //             navigation.navigate('BottomTabNavigation');
-        //             Alert.alert('Login successful', data.message);
-        //         }else{
-        //             Alert.alert('Login failed', data.message);
-        //         }
-        //     })
-        //     .catch(error => {
-        //         console.error('Login failed:', error);
-        //         Alert.alert('Login failed', data.message);
-
-        //     });
+            if (data.message === "Login successful") {
+                await AsyncStorage.setItem('token', data.token);
+                Alert.alert('Login successful', data.message);
+                navigation.navigate('BottomTabNavigation');
+            } else {
+                Alert.alert('Login failed', data.message || 'Invalid credentials');
+            }
+        } catch (error) {
+            console.error('Login error:', error);
+            Alert.alert('Login failed', 'Something went wrong. Please try again.');
+        }
     }
 
     return (

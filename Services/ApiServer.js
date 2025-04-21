@@ -1,15 +1,18 @@
 class ApiServer {
-    static baseServer = 'https://rare-heartily-bunny.ngrok-free.app';
+    static baseServer = 'https://easy-yak-unique.ngrok-free.app';
 
-    static call(endpoint, method = 'GET', body = null) {
-
+    static call(endpoint, method = 'GET', body = null, customHeaders = {}) {
         const url = `${this.baseServer}${endpoint}`;
+
+        const headers = {
+            'Content-Type': 'application/json',
+            'ngrok-skip-browser-warning': 'true',
+            ...customHeaders,
+        };
 
         const options = {
             method: method,
-            headers: {
-                'Content-Type': 'application/json',
-            },
+            headers: headers,
             ...(body && { body: JSON.stringify(body) }),
         };
 
@@ -25,6 +28,7 @@ class ApiServer {
                 throw error;
             });
     }
+
 }
 
 export default ApiServer;

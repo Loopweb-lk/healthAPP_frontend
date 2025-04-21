@@ -1,30 +1,42 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text, StyleSheet, TouchableOpacity, ScrollView, Alert } from 'react-native';
+import { View, Text, StyleSheet, TouchableOpacity, ScrollView, Alert, ActivityIndicator } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
 import ApiServer from './../Services/ApiServer';
 import * as FileSystem from 'expo-file-system';
 import * as Sharing from 'expo-sharing';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 function GroceryList({ navigation, route }) {
 
   const { mealIds } = route.params;
   const [ingredientData, setingredientData] = useState({});
+  const [loading, setloading] = useState(false);
 
   useEffect(() => {
-    const endpoint = '/api/meal/getIngredients';
+    const fetchGrocery = async () => {
+      setloading(true)
+      const endpoint = '/api/meal/getIngredients';
+      const token = await AsyncStorage.getItem('token');
+      const headers = {
+        Authorization: `Bearer ${token}`
+      }
 
-    const body = {
-      food_ids: mealIds,
-    }
+      const body = {
+        food_ids: mealIds,
+      }
 
-    ApiServer.call(endpoint, 'POST', body)
-      .then(data => {
-        setingredientData(data);
-      })
-      .catch(error => {
-        Alert.alert('Data request failed', error.message);
-      });
+      ApiServer.call(endpoint, 'POST', body, headers)
+        .then(data => {
+          setingredientData(data);
+          setloading(false)
+        })
+        .catch(error => {
+          Alert.alert('Data request failed', error.message);
+        });
+    };
+
+    fetchGrocery();
   }, []);
 
   async function downloadFile() {
@@ -73,7 +85,13 @@ function GroceryList({ navigation, route }) {
       <ScrollView style={styles.content}>
         <Text style={styles.mainTitle}>Your weekly grocery items</Text>
 
-        {Object.keys(ingredientData).length !== 0 ? (
+        {loading ? (
+          <ActivityIndicator size="large" />
+        ) : (
+          <View></View>
+        )}
+
+        {Object.keys(ingredientData).length !== 0 && !loading ? (
           renderSection(ingredientData.ingredients)
         ) : (
           <Text>No ingredients available</Text>
