@@ -180,7 +180,7 @@ function EnterMealItems({ navigation }) {
         </ScrollView>
 
         <View style={styles.bottomNav}>
-          <TouchableOpacity style={styles.nextButton}>
+          <TouchableOpacity style={styles.nextButton} onPress={() => { navigation.navigate('RecordMeal') }}>
             <Text style={styles.nextButtonText}>Next</Text>
           </TouchableOpacity>
         </View>

@@ -59,6 +59,7 @@ function RecordMeal({ navigation }) {
       <View style={styles.card}>
         <Text style={styles.cardTitle}>Select Meal Time</Text>
         <View style={styles.timePickerContainer}>
+
           <View style={styles.pickerWrapper}>
             <Picker
               selectedValue={selectedHour}
@@ -70,6 +71,7 @@ function RecordMeal({ navigation }) {
               ))}
             </Picker>
           </View>
+
           <View style={styles.pickerWrapper}>
             <Picker
               selectedValue={selectedMinute}
@@ -81,6 +83,7 @@ function RecordMeal({ navigation }) {
               ))}
             </Picker>
           </View>
+
           <View style={styles.pickerWrapper}>
             <Picker
               selectedValue={selectedMeridiem}
@@ -91,6 +94,7 @@ function RecordMeal({ navigation }) {
               <Picker.Item label="PM" value="PM" />
             </Picker>
           </View>
+
         </View>
 
         <Text style={styles.cardTitle}>Select Type</Text>
@@ -165,14 +169,22 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
     marginBottom: 15,
   },
+
   pickerWrapper: {
     borderWidth: 1,
     borderColor: '#ccc',
     borderRadius: 8,
-    backgroundColor: '#fff',
-    overflow: 'hidden',
     width: '30%',
+    height: 60,
+    overflow: 'hidden',
   },
+
+  picker: {
+    height: 280, // keep enough height for the wheel to work
+    marginTop: -80, // shift up to hide top items
+    marginBottom: -120, // shift down to hide bottom items
+  },
+
   pickerWrapper2: {
     borderWidth: 1,
     borderColor: '#ccc',
@@ -180,11 +192,9 @@ const styles = StyleSheet.create({
     backgroundColor: '#fff',
     overflow: 'hidden',
     width: '100%',
+    height: 60,
   },
-  picker: {
-    height: 50,
-    width: '100%',
-  },
+
   saveButton: {
     backgroundColor: 'rgba(24, 117, 195, 1)',
     borderRadius: 120,

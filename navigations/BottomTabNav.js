@@ -13,6 +13,7 @@ import { COLORS } from "../constants";
 import { Create, Home, Meals, Profile, Settings } from "../screens";
 import Feather from "react-native-vector-icons/Feather"; // Import Feather icons
 import ActivityOverview from "../screens/ActivityOverview";
+import RecordSugar from "../screens/RecordSugar";
 
 const Tab = createBottomTabNavigator();
 
@@ -199,8 +200,8 @@ const BottomTabNav = () => {
       />
 
       <Tab.Screen
-        name="Settings"
-        component={Settings}
+        name="RecordSugar"
+        component={RecordSugar}
         options={{
           tabBarIcon: ({ focused }) => (
             <View

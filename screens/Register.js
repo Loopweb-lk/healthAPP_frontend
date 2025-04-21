@@ -19,7 +19,6 @@ import Welcome from '../Welcome';
 import Login from './Login';
 import ApiServer from './../Services/ApiServer';
 import { Picker } from '@react-native-picker/picker';
-import { types } from '@babel/core';
 
 function Register({ navigation }) {
 

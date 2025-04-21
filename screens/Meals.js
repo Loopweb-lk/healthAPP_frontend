@@ -49,7 +49,6 @@ function Meals({ navigation }) {
   };
 
   const handleFilter = () => {
-    // Add your filter logic here
     setModalVisible(false);
   };
 
@@ -86,6 +85,7 @@ function Meals({ navigation }) {
         <Text style={{ fontSize: 16, fontWeight: '500' }}>{template.name}</Text>
         <Text style={{ color: '#666', fontSize: 12, marginTop: 4 }}>{template.created}</Text>
         <View style={{ flexDirection: 'row', marginTop: 8, gap: 8 }}>
+          
           {template.tags.map((tag, index) => (
             <View
               key={index}
@@ -107,6 +107,7 @@ function Meals({ navigation }) {
               </TouchableOpacity>
             </View>
           ))}
+          
         </View>
       </View>
       <View>

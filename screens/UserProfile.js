@@ -1,8 +1,10 @@
 import React, { useState } from 'react';
-import { View, Text, StyleSheet, TouchableOpacity, Image, ScrollView, Modal, TextInput, Platform } from 'react-native';
+import { View, Text, StyleSheet, TouchableOpacity, Image, ScrollView, Modal, TextInput, Platform, TouchableWithoutFeedback } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
 import DateTimePicker from '@react-native-community/datetimepicker';
+import { Picker } from '@react-native-picker/picker';
+import { Feather } from '@expo/vector-icons';
 
 function UserProfile({ navigation }) {
   const [profileDetails, setProfileDetails] = useState({
@@ -13,16 +15,22 @@ function UserProfile({ navigation }) {
     weight: '65',
     bmi: '22.5'
   });
-  
+
   const [editModalVisible, setEditModalVisible] = useState(false);
-  const [editableDetails, setEditableDetails] = useState({...profileDetails});
+  const [editableDetails, setEditableDetails] = useState({ ...profileDetails });
   const [showDatePicker, setShowDatePicker] = useState(false);
   const [date, setDate] = useState(new Date(2001, 10, 11)); // For date picker (months are 0-indexed)
+  const [isDropdownOpen, setIsDropdownOpen] = useState(false);
+  const [selectedOption, setSelectedOption] = useState('');
+
+  const toggleDropdown = () => {
+    setIsDropdownOpen(!isDropdownOpen);
+  };
 
   const calculateBMI = (height, weight) => {
     const heightValue = parseFloat(height);
     const weightValue = parseFloat(weight);
-    
+
     if (!isNaN(heightValue) && !isNaN(weightValue) && heightValue > 0) {
       // Convert height from cm to meters for BMI calculation
       const heightInMeters = heightValue / 100;
@@ -35,7 +43,7 @@ function UserProfile({ navigation }) {
   const saveDetails = () => {
     // Calculate BMI
     const bmi = calculateBMI(editableDetails.height, editableDetails.weight);
-    
+
     setProfileDetails({
       ...editableDetails,
       bmi: bmi
@@ -52,7 +60,7 @@ function UserProfile({ navigation }) {
 
   const openEditModal = () => {
     // Reset editable details to current profile details
-    setEditableDetails({...profileDetails});
+    setEditableDetails({ ...profileDetails });
     setDate(new Date(profileDetails.birthday.replace(/(\d{4})\/(\d{2})\/(\d{2})/, '$1-$2-$3')));
     setEditModalVisible(true);
   };
@@ -62,14 +70,14 @@ function UserProfile({ navigation }) {
       setShowDatePicker(false);
       return;
     }
-    
+
     const currentDate = selectedDate || date;
     setShowDatePicker(Platform.OS === 'ios');
     setDate(currentDate);
-    
+
     // Format the date as YYYY/MM/DD
     const formattedDate = `${currentDate.getFullYear()}/${String(currentDate.getMonth() + 1).padStart(2, '0')}/${String(currentDate.getDate()).padStart(2, '0')}`;
-    
+
     handleChange('birthday', formattedDate);
   };
 
@@ -99,50 +107,50 @@ function UserProfile({ navigation }) {
         {/* Profile Details Card */}
         <View style={styles.profileCard}>
           <Text style={styles.sectionTitle}>Your Profile</Text>
-          
+
           {/* Profile Fields */}
           <View style={styles.fieldContainer}>
             <Text style={styles.fieldLabel}>Name</Text>
             <Text style={styles.fieldValue}>{profileDetails.name}</Text>
           </View>
-          
+
           <View style={styles.divider} />
-          
+
           <View style={styles.fieldContainer}>
             <Text style={styles.fieldLabel}>Birthday</Text>
             <Text style={styles.fieldValue}>{profileDetails.birthday}</Text>
           </View>
-          
+
           <View style={styles.divider} />
-          
+
           <View style={styles.fieldContainer}>
             <Text style={styles.fieldLabel}>Gender</Text>
             <Text style={styles.fieldValue}>{profileDetails.gender}</Text>
           </View>
-          
+
           <View style={styles.divider} />
-          
+
           <View style={styles.fieldContainer}>
             <Text style={styles.fieldLabel}>Height</Text>
             <Text style={styles.fieldValue}>{profileDetails.height} cm</Text>
           </View>
-          
+
           <View style={styles.divider} />
-          
+
           <View style={styles.fieldContainer}>
             <Text style={styles.fieldLabel}>Weight</Text>
             <Text style={styles.fieldValue}>{profileDetails.weight} kg</Text>
           </View>
-          
+
           <View style={styles.divider} />
-          
+
           <View style={styles.fieldContainer}>
             <Text style={styles.fieldLabel}>BMI (Calculated)</Text>
             <Text style={styles.fieldValue}>{profileDetails.bmi}</Text>
           </View>
 
           {/* Edit Details Button */}
-          <TouchableOpacity 
+          <TouchableOpacity
             style={styles.editButton}
             onPress={openEditModal}
           >
@@ -159,7 +167,7 @@ function UserProfile({ navigation }) {
       >
         <SafeAreaView style={styles.modalContainer}>
           <View style={styles.modalHeader}>
-            <TouchableOpacity 
+            <TouchableOpacity
               onPress={() => setEditModalVisible(false)}
               style={styles.backButton}
             >
@@ -168,10 +176,10 @@ function UserProfile({ navigation }) {
             <Text style={styles.headerTitle}>Edit Profile</Text>
             <View style={styles.placeholderView} />
           </View>
-          
+
           <ScrollView style={styles.modalScrollContent}>
             {/* <Text style={styles.modalTitle}>Edit Profile</Text> */}
-            
+
             <View style={styles.inputGroup}>
               <Text style={styles.inputLabel}>Name</Text>
               <View style={styles.inputContainer}>
@@ -183,60 +191,60 @@ function UserProfile({ navigation }) {
                 />
               </View>
             </View>
-            
+
             <View style={styles.inputGroup}>
               <Text style={styles.inputLabel}>Birthday</Text>
-              <TouchableOpacity 
+              <TouchableOpacity
                 style={styles.inputContainer}
                 onPress={() => setShowDatePicker(true)}
               >
                 <Text style={styles.textInput}>{editableDetails.birthday}</Text>
                 <Ionicons name="calendar-outline" size={20} color="#8E8E93" />
               </TouchableOpacity>
-              
+
               {showDatePicker && (
                 <DateTimePicker
                   value={date}
                   mode="date"
                   display={Platform.OS === 'ios' ? "spinner" : "default"}
                   onChange={onDateChange}
-                  style={{backgroundColor:'black'}}
+                  style={{ backgroundColor: 'black' }}
                 />
               )}
             </View>
-            
+
             <View style={styles.inputGroup}>
               <Text style={styles.inputLabel}>Gender</Text>
               <View style={styles.genderContainer}>
-                <TouchableOpacity 
+                <TouchableOpacity
                   style={[
-                    styles.genderOption, 
+                    styles.genderOption,
                     editableDetails.gender === 'Female' && styles.selectedGender
                   ]}
                   onPress={() => handleChange('gender', 'Female')}
                 >
-                  <Ionicons 
-                    name={editableDetails.gender === 'Female' ? "radio-button-on" : "radio-button-off"} 
-                    size={22} 
-                    color={editableDetails.gender === 'Female' ? "#007AFF" : "#8E8E93"} 
+                  <Ionicons
+                    name={editableDetails.gender === 'Female' ? "radio-button-on" : "radio-button-off"}
+                    size={22}
+                    color={editableDetails.gender === 'Female' ? "#007AFF" : "#8E8E93"}
                   />
                   <Text style={[
                     styles.genderText,
                     editableDetails.gender === 'Female' && styles.selectedGenderText
                   ]}>Female</Text>
                 </TouchableOpacity>
-                
-                <TouchableOpacity 
+
+                <TouchableOpacity
                   style={[
-                    styles.genderOption, 
+                    styles.genderOption,
                     editableDetails.gender === 'Male' && styles.selectedGender
                   ]}
                   onPress={() => handleChange('gender', 'Male')}
                 >
-                  <Ionicons 
-                    name={editableDetails.gender === 'Male' ? "radio-button-on" : "radio-button-off"} 
-                    size={22} 
-                    color={editableDetails.gender === 'Male' ? "#007AFF" : "#8E8E93"} 
+                  <Ionicons
+                    name={editableDetails.gender === 'Male' ? "radio-button-on" : "radio-button-off"}
+                    size={22}
+                    color={editableDetails.gender === 'Male' ? "#007AFF" : "#8E8E93"}
                   />
                   <Text style={[
                     styles.genderText,
@@ -245,7 +253,7 @@ function UserProfile({ navigation }) {
                 </TouchableOpacity>
               </View>
             </View>
-            
+
             <View style={styles.inputGroup}>
               <Text style={styles.inputLabel}>Height (cm)</Text>
               <View style={styles.inputContainer}>
@@ -258,7 +266,7 @@ function UserProfile({ navigation }) {
                 />
               </View>
             </View>
-            
+
             <View style={styles.inputGroup}>
               <Text style={styles.inputLabel}>Weight (kg)</Text>
               <View style={styles.inputContainer}>
@@ -278,7 +286,7 @@ function UserProfile({ navigation }) {
                 />
               </View>
             </View>
-            
+
             <View style={styles.inputGroup}>
               <Text style={styles.inputLabel}>BMI (Calculated)</Text>
               <View style={styles.inputContainer}>
@@ -287,8 +295,66 @@ function UserProfile({ navigation }) {
                 </Text>
               </View>
             </View>
-            
-            <TouchableOpacity 
+
+            <View style={styles.inputGroup}>
+              <Text style={styles.inputLabel}>Meal Option</Text>
+              <View style={styles.inputContainer}>
+                <TouchableOpacity onPress={toggleDropdown}>
+                  <Text style={styles.textInput}>
+                    {selectedOption ? selectedOption : 'Select Option'}
+                  </Text>
+                </TouchableOpacity>
+              </View>
+
+              {isDropdownOpen && (
+                <>
+                  <TouchableWithoutFeedback onPress={() => setIsDropdownOpen(false)}>
+                    <View style={styles.overlay}></View>
+                  </TouchableWithoutFeedback>
+                  <View style={styles.dropdownContainer}>
+                    <Picker
+                      selectedValue={selectedOption}
+                      style={styles.picker}
+                      onValueChange={(itemValue) => {
+                        setSelectedOption(itemValue);
+                        setIsDropdownOpen(false);
+                      }}
+                    >
+                      <Picker.Item style={styles.pickerItem} label="Veg" value="veg" />
+                      <Picker.Item style={styles.pickerItem} label="Non-veg" value="non-veg" />
+                    </Picker>
+                  </View>
+                </>
+              )}
+            </View>
+
+            <View style={styles.inputGroup}>
+              <Text style={styles.inputLabel}>Daily calorie burn out goal(cal)</Text>
+              <View style={styles.inputContainer}>
+                <TextInput
+                  style={styles.textInput}
+                  value={editableDetails.height}
+                  onChangeText={(text) => handleChange('CBG', text)}
+                  placeholder="Height in cm"
+                  keyboardType="numeric"
+                />
+              </View>
+            </View>
+
+            <View style={styles.inputGroup}>
+              <Text style={styles.inputLabel}>Daily Calorie Intake Goal(cal)</Text>
+              <View style={styles.inputContainer}>
+                <TextInput
+                  style={styles.textInput}
+                  value={editableDetails.height}
+                  onChangeText={(text) => handleChange('CIG', text)}
+                  placeholder="Height in cm"
+                  keyboardType="numeric"
+                />
+              </View>
+            </View>
+
+            <TouchableOpacity
               style={styles.editButton}
               onPress={saveDetails}
             >
@@ -539,6 +605,17 @@ const styles = StyleSheet.create({
     color: '#007AFF',
     fontWeight: '500',
   },
+
+  dropdownContainer: {
+    borderColor: '#E5E5E5',
+    borderRadius: 12,
+    backgroundColor: '#B1B1B1FF',
+    color: "black"
+  },
+
+  pickerItem: {
+    color: "#000000FF"
+  }
 });
 
 export default UserProfile;
