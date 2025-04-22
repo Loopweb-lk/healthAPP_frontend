@@ -1,5 +1,5 @@
 import { View, Text, StyleSheet, TouchableOpacity, ScrollView, SafeAreaView, StatusBar, Modal, Image } from 'react-native';
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import Icon from 'react-native-vector-icons/Ionicons';
 import { useFonts, Inter_400Regular, Inter_700Bold } from "@expo-google-fonts/inter";
 import {
@@ -10,11 +10,61 @@ import {
   FontAwesome5,
   Ionicons
 } from "@expo/vector-icons";
+import ApiServer from './../Services/ApiServer';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 function Home({ navigation }) {
 
   const [showSettings, setShowSettings] = useState(false);
   const [selectedTime, setSelectedTime] = useState(new Date());
+  const [activity, setActivity] = useState(null);
+  const [sugar, setSugar] = useState(null);
+  const [meal, setMeal] = useState(null);
+  const [event, setEvent] = useState([]);
+  const [nextEvent, setNextEvent] = useState(0);
+
+  const getClosestEvent = (events) => {
+    const currentDate = new Date();
+
+    const closestEvent = events.reduce((closest, event) => {
+
+      const eventDate = new Date(event.timeStamp);
+      const daysToEvent = Math.floor((eventDate - currentDate) / (1000 * 3600 * 24));
+
+      if (daysToEvent >= 0 && (closest.daysToEvent === undefined || daysToEvent < closest.daysToEvent)) {
+        return { ...event, daysToEvent };
+      }
+
+      return closest;
+    }, {});
+
+    return closestEvent;
+  };
+
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const endpoint = '/api/general/home';
+        const token = await AsyncStorage.getItem('token');
+        const headers = {
+          Authorization: `Bearer ${token}`
+        }
+        const data = await ApiServer.call(endpoint, 'GET', null, headers);
+        setActivity(data.activity);
+        setSugar(data.sugar);
+        setMeal(data.mealData)
+        setEvent(data.event);
+
+        const closestEvent = getClosestEvent(data.event);
+        setNextEvent(closestEvent.daysToEvent);
+
+      } catch (error) {
+        Alert.alert('request failed', error.message);
+      }
+    };
+
+    fetchData();
+  }, []);
 
   // Function to determine whether it's morning or evening
   const getGreeting = () => {
@@ -120,67 +170,93 @@ function Home({ navigation }) {
         </View>
 
         {/* Water Tip Card */}
-        <View style={[styles.card, styles.tipCard]}>
-          {/* <View style={styles.tipIconContainer}> */}
-          {/* <Icon name="bulb-outline" size={24} color="#FFF" /> */}
-          <Image source={{ uri: 'https://www.loopwebit.com/light.png' }}
-            style={{ width: 45, height: 50 }}
-          />
-          {/* </View> */}
-          <Text style={styles.tipText}>
-            Drinking at least 1.5 to 2 liters of water a day helps flush toxins from your body
-          </Text>
-        </View>
+        {sugar && (
+          <View
+            style={[
+              styles.card,
+              styles.tipCard,
+              sugar.level > 120 && { backgroundColor: 'red' }
+            ]}
+          >
+            <Image
+              source={{ uri: 'https://www.loopwebit.com/light.png' }}
+              style={{ width: 45, height: 50 }}
+            />
+            <Text style={styles.tipText}>
+              {sugar.level > 120
+                ? 'Your Sugar Level Is above Normal Levels!'
+                : 'Drinking at least 1.5 to 2 liters of water a day helps flush toxins from your body'}
+            </Text>
+          </View>
+        )}
 
-        {/* Two Column Layout for Checkup and Sugar Level */}
+
         <View style={styles.rowContainer}>
           {/* Upcoming Checkups */}
           <View style={[styles.card, styles.checkupCard]}>
-            <Text style={styles.cardTitle}>7 Days</Text>
+            <Text style={styles.cardTitle}>{nextEvent} Days</Text>
             <Text style={styles.cardSubtitle}>Till next Checkup</Text>
             <View style={styles.appointmentList}>
-              <Text style={styles.appointmentText}>17th Nov</Text>
-              <Text style={styles.appointmentSubtext}>Clinic at Hospital</Text>
-              <Text style={styles.appointmentText}>24th Nov</Text>
-              <Text style={styles.appointmentSubtext}>Blood test Date</Text>
-              <Text style={styles.appointmentText}>31th Nov</Text>
-              <Text style={styles.appointmentSubtext}>Doctor Checkup</Text>
+              {event.map((item, index) => (
+                <React.Fragment key={index}>
+                  <Text style={styles.appointmentText}>{item.date}</Text>
+                  <Text style={styles.appointmentSubtext}>{item.name}</Text>
+                </React.Fragment>
+              ))}
             </View>
             <TouchableOpacity style={styles.floatingAddButton} onPress={() => { navigation.navigate("Calender") }}>
               <MaterialIcons name="add-circle-outline" size={39} color="rgba(68, 92, 113, 1)" />
             </TouchableOpacity>
           </View>
 
-          {/* Sugar Level Card */}
-          <View style={[styles.card, styles.sugarCard]}>
-            <Text style={styles.sugarValue}>90</Text>
-            <Text style={styles.sugarLabel}>Sugar Level</Text>
-            <Text style={styles.sugarTime}>Breakfast</Text>
-          </View>
+          {sugar && (
+            <View
+              style={[
+                styles.card,
+                styles.sugarCard,
+                sugar.level > 120 && { backgroundColor: 'red' }
+              ]}
+            >
+              <Text style={styles.sugarValue}>{sugar.level}</Text>
+              <Text style={styles.sugarLabel}>Sugar Level</Text>
+              <Text style={styles.sugarTime}>{sugar.meal}</Text>
+            </View>
+          )}
+
         </View>
 
         {/* Create Stats */}
-        <View style={[styles.card, styles.CreateCard]}>
+        {activity && (<View style={[styles.card, styles.CreateCard]}>
           <View style={styles.CreateIconContainer}>
             <Icon name="fitness" size={40} color="#000" />
           </View>
           <View style={styles.CreateStats}>
-            <Text style={styles.CreateValue}>128 cal</Text>
-            <Text style={styles.CreateTime}>/ 40 min</Text>
+            <Text style={styles.CreateValue}>{activity.burnedCal} cal</Text>
+            <Text style={styles.CreateTime}>/ {(Number(activity.timePeriod) / 60).toFixed(2)
+            } min</Text>
           </View>
         </View>
+        )}
 
         {/* Calories Progress */}
         <View style={styles.progressContainer}>
-          {['#4CAF50', '#FFC107', '#FF5722'].map((color, index) => (
-            <View key={index} style={[styles.progressCard, styles.card]}>
-              <View style={[styles.progressCircle, { borderColor: color }]}>
-                <Text style={styles.progressText}>324/500</Text>
-                <Text style={styles.progressLabel}>Calories</Text>
+          {['breakfast', 'lunch', 'dinner'].map((mealType, index) => {
+            const mealData = meal && meal[mealType] ? meal[mealType] : { name: 'Not Found', totalCal: 0 };
+            const progressColor = index === 0 ? '#4CAF50' : index === 1 ? '#FFC107' : '#FF5722';
+
+            return (
+              <View key={index} style={[styles.progressCard, styles.card]}>
+                <View style={[styles.progressCircle, { borderColor: progressColor }]}>
+                  <Text style={styles.progressText}>
+                    {mealData.totalCal}/{500}
+                  </Text>
+                  <Text style={styles.progressLabel}>Calories</Text>
+                </View>
               </View>
-            </View>
-          ))}
+            );
+          })}
         </View>
+
 
         {/* Meal Planner */}
         <TouchableOpacity onPress={() => navigation.navigate('MealPlanner')} style={[styles.card, styles.mealPlannerCard]}>

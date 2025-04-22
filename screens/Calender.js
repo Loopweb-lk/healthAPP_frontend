@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   View,
   Text,
@@ -6,35 +6,28 @@ import {
   TouchableOpacity,
   Modal,
   TextInput,
+  ScrollView,
   Platform,
 } from 'react-native';
 import { Calendar } from 'react-native-calendars';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
 import DateTimePicker from '@react-native-community/datetimepicker';
+import ApiServer from './../Services/ApiServer';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 function Calender({ navigation }) {
   const [selectedDate, setSelectedDate] = useState('');
   const [eventName, setEventName] = useState('');
   const [eventTime, setEventTime] = useState('');
+
   const [modalVisible, setModalVisible] = useState(false);
   const [showDatePicker, setShowDatePicker] = useState(false);
   const [showTimePicker, setShowTimePicker] = useState(false);
   const [dateObject, setDateObject] = useState(new Date());
   const [timeObject, setTimeObject] = useState(new Date());
-
-  const appointments = [
-    {
-      title: 'Doctor Appointment',
-      subtitle: 'April 18, 10:00 AM',
-      daysMore: 'In 2 days',
-    },
-    {
-      title: 'Nutritionist Session',
-      subtitle: 'April 20, 2:00 PM',
-      daysMore: 'In 4 days',
-    },
-  ];
+  const [appointments, setAppointments] = useState([]);
+  const [markedDates, setmarkedDates] = useState(null);
 
   const formatTime = (date) => {
     let hours = date.getHours();
@@ -45,6 +38,93 @@ function Calender({ navigation }) {
     return strTime;
   };
 
+  const getEvents = async () => {
+    try {
+      const endpoint = '/api/event/events';
+      const token = await AsyncStorage.getItem('token');
+      const headers = {
+        Authorization: `Bearer ${token}`
+      }
+      const data = await ApiServer.call(endpoint, 'GET', null, headers);
+
+      const mappedData = data.records.map((item) => {
+        const date = new Date(item.selectedDate);
+
+        const dateString = date.toLocaleDateString('en-US', {
+          month: 'long',
+          day: 'numeric',
+        });
+
+        const subtitle = `${dateString}, ${item.eventTime}`;
+        const today = new Date();
+        const oneDay = 24 * 60 * 60 * 1000;
+        const eventDateOnly = new Date(date.getFullYear(), date.getMonth(), date.getDate());
+        const todayOnly = new Date(today.getFullYear(), today.getMonth(), today.getDate());
+        const daysDiff = Math.round((eventDateOnly - todayOnly) / oneDay);
+
+        const daysMore = daysDiff === 0
+          ? 'Today'
+          : daysDiff > 0
+            ? `In ${daysDiff} day${daysDiff > 1 ? 's' : ''}`
+            : `${Math.abs(daysDiff)} day${Math.abs(daysDiff) > 1 ? 's' : ''} ago`;
+
+        return {
+          title: item.eventName,
+          subtitle,
+          daysMore,
+        };
+      });
+
+      const temp = data.records.reduce((acc, item) => {
+        const dateKey = new Date(new Date(item.selectedDate).setDate(new Date(item.selectedDate).getDate() + 1)).toISOString().split('T')[0];
+        acc[dateKey] = {
+          selected: true,
+          selectedColor: '#007bff',
+          selectedTextColor: '#fff',
+        };
+        return acc;
+      }, {});
+
+      setAppointments(mappedData);
+      setmarkedDates(temp);
+    } catch (error) {
+      Alert.alert('request failed', error.message);
+    }
+  }
+
+  const handleSubmit = async () => {
+
+    const body = {
+      eventName: eventName,
+      selectedDate: selectedDate,
+      eventTime: eventTime
+    }
+    setModalVisible(false);
+
+    const endpoint = '/api/event/createRecord';
+    const token = await AsyncStorage.getItem('token');
+    const headers = {
+      Authorization: `Bearer ${token}`
+    }
+
+    try {
+      const data = await ApiServer.call(endpoint, 'POST', body, headers);
+      if (data.message === "Sugar Log created successfully") {
+        await getEvents();
+        setEventName('');
+        setEventTime('');
+        setSelectedDate('');
+        setModalVisible(false);
+      }
+    } catch (error) {
+      console.error('creation failed:', error);
+    }
+  };
+
+  useEffect(() => {
+    getEvents();
+  }, []);
+
   return (
     <SafeAreaView style={styles.container}>
       <TouchableOpacity onPress={() => navigation.goBack()}>
@@ -54,41 +134,38 @@ function Calender({ navigation }) {
 
       {/* Calendar */}
       <View style={styles.card}>
-        <Calendar
-          markedDates={{
-            [selectedDate]: {
-              selected: true,
-              selectedColor: '#007bff',
-              selectedTextColor: '#fff',
-            },
-          }}
-          theme={{
-            backgroundColor: '#ffffff',
-            calendarBackground: '#ffffff',
-            textSectionTitleColor: '#b6c1cd',
-            selectedDayBackgroundColor: '#007bff',
-            selectedDayTextColor: '#ffffff',
-            todayTextColor: '#007bff',
-            dayTextColor: '#2d4150',
-            textDisabledColor: '#d9e1e8',
-            arrowColor: '#007bff',
-            monthTextColor: '#2d4150',
-            textDayFontWeight: '400',
-            textMonthFontWeight: 'bold',
-            textDayHeaderFontWeight: '600',
-            textDayFontSize: 16,
-            textMonthFontSize: 18,
-            textDayHeaderFontSize: 14,
-          }}
-          style={styles.calendar}
-          onDayPress={(day) => {
-            setSelectedDate(day.dateString);
-          }}
-        />
+        {markedDates && Object.keys(markedDates).length > 0 && (
+          <Calendar
+            markedDates={markedDates}
+            theme={{
+              backgroundColor: '#ffffff',
+              calendarBackground: '#ffffff',
+              textSectionTitleColor: '#b6c1cd',
+              selectedDayBackgroundColor: '#007bff',
+              selectedDayTextColor: '#ffffff',
+              todayTextColor: '#007bff',
+              dayTextColor: '#2d4150',
+              textDisabledColor: '#d9e1e8',
+              arrowColor: '#007bff',
+              monthTextColor: '#2d4150',
+              textDayFontWeight: '400',
+              textMonthFontWeight: 'bold',
+              textDayHeaderFontWeight: '600',
+              textDayFontSize: 16,
+              textMonthFontSize: 18,
+              textDayHeaderFontSize: 14,
+            }}
+            style={styles.calendar}
+            onDayPress={(day) => {
+              setSelectedDate(day.dateString);
+            }}
+          />
+        )}
       </View>
 
+
       {/* Upcoming Appointments */}
-      <View style={styles.appointmentsSection}>
+      <ScrollView style={styles.appointmentsSection}>
         <Text style={styles.appointmentsTitle}>Upcoming Appointments</Text>
         {appointments.map((apt, index) => (
           <View key={index} style={styles.appointmentCard}>
@@ -108,7 +185,7 @@ function Calender({ navigation }) {
           <Ionicons name="add" size={20} color="#4B89DC" />
           <Text style={styles.createButtonText}>Create New</Text>
         </TouchableOpacity>
-      </View>
+      </ScrollView >
 
       {/* Modal */}
       <Modal
@@ -168,14 +245,7 @@ function Calender({ navigation }) {
 
               <TouchableOpacity
                 style={modalStyles.saveButton}
-                onPress={() => {
-                  console.log('Saved Event:', {
-                    eventName,
-                    selectedDate,
-                    eventTime,
-                  });
-                  setModalVisible(false);
-                }}
+                onPress={handleSubmit}
               >
                 <Text style={{ color: '#fff', marginTop: 5, fontWeight: '600' }}>
                   Save
