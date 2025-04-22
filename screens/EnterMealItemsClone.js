@@ -15,7 +15,8 @@ import Icon from 'react-native-vector-icons/Ionicons';
 import ApiServer from './../Services/ApiServer';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
-function EnterMealItems({ navigation }) {
+function EnterMealItems({ navigation, route }) {
+  const { id } = route.params;
   const [calories, setCalories] = useState(0);
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedItems, setSelectedItems] = useState([]);
@@ -55,6 +56,26 @@ function EnterMealItems({ navigation }) {
       }
     };
 
+    const fetchClone = async () => {
+      try {
+        const endpoint = '/api/meal/cloneMeal';
+
+        const body = {
+          id: id,
+        };
+
+        const token = await AsyncStorage.getItem('token');
+        const headers = {
+          Authorization: `Bearer ${token}`
+        }
+        const data = await ApiServer.call(endpoint, 'POST', body, headers);
+        setCalories(data.data.totalCal)
+        setSelectedItems((prev) => [...data.data.foodIds]);
+      } catch (error) {
+        Alert.alert('request failed', error.message);
+      }
+    };
+    fetchClone();
     fetchMeals();
   }, []);
 

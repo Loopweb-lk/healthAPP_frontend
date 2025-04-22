@@ -4,11 +4,12 @@ import { Calendar } from 'react-native-calendars';
 import { Picker } from '@react-native-picker/picker';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
+import ApiServer from './../Services/ApiServer';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
-function EnterActivityTime({ navigation }) {
+function EnterActivityTime({ route, navigation }) {
+  const { id, activity, icon, rate } = route.params;
   const [selectedDate, setSelectedDate] = useState('');
-
-  // Time state
   const [startHour, setStartHour] = useState('10');
   const [startMinute, setStartMinute] = useState('00');
   const [startPeriod, setStartPeriod] = useState('AM');
@@ -17,14 +18,52 @@ function EnterActivityTime({ navigation }) {
   const [endMinute, setEndMinute] = useState('00');
   const [endPeriod, setEndPeriod] = useState('AM');
 
-  // Hour options (1-12, padded with 0)
   const hourOptions = Array.from({ length: 12 }, (_, i) => String(i + 1).padStart(2, '0'));
-  
-  // Minute options (all minutes from 00-59)
   const minuteOptions = Array.from({ length: 60 }, (_, i) => String(i).padStart(2, '0'));
-  
-  // Period options (AM/PM)
   const periodOptions = ['AM', 'PM'];
+
+  const convertTo24Hour = (hour, minute, period) => {
+    let h = parseInt(hour, 10);
+    if (period === 'PM' && h !== 12) h += 12;
+    if (period === 'AM' && h === 12) h = 0;
+    return `${String(h).padStart(2, '0')}:${minute}`;
+  };
+
+  const getDateTimeObject = (dateStr, hour, minute, period) => {
+    const time24 = convertTo24Hour(hour, minute, period);
+    return new Date(`${dateStr}T${time24}:00`);
+  };
+
+  const handleSubmit = async () => {
+
+    const startTime = getDateTimeObject(selectedDate, startHour, startMinute, startPeriod);
+    const endTime = getDateTimeObject(selectedDate, endHour, endMinute, endPeriod);
+    const timePeriod = Math.max(0, Math.floor((endTime - startTime) / 1000));
+    const totalRate = Number((rate * timePeriod).toFixed(2));
+
+    const body = {
+      activity: activity,
+      timePeriod: timePeriod,
+      timestamp: endTime,
+      burnedCal: totalRate
+    }
+
+    const endpoint = '/api/activity/createActivity';
+    const token = await AsyncStorage.getItem('token');
+    const headers = {
+      Authorization: `Bearer ${token}`
+    }
+
+    ApiServer.call(endpoint, 'POST', body, headers)
+      .then(data => {
+        if (data.message == "Activity Log created successfully") {
+          navigation.navigate('BottomTabNavigation');
+        }
+      })
+      .catch(error => {
+        console.error('creation failed:', error);
+      });
+  }
 
   return (
     <SafeAreaView style={styles.container}>
@@ -83,7 +122,7 @@ function EnterActivityTime({ navigation }) {
                   dropdownIconColor="#007bff"
                 >
                   {hourOptions.map((hour) => (
-                    <Picker.Item key={hour} label={hour} value={hour}/>
+                    <Picker.Item key={hour} label={hour} value={hour} />
                   ))}
                 </Picker>
               </View>
@@ -176,19 +215,9 @@ function EnterActivityTime({ navigation }) {
       </View>
 
       {/* Save Button */}
-      <TouchableOpacity 
+      <TouchableOpacity
         style={styles.saveButton}
-        onPress={() => {
-          // Here you can submit the record with the collected data
-          console.log("Submitting record:", {
-            date: selectedDate,
-            startTime: `${startHour}:${startMinute} ${startPeriod}`,
-            endTime: `${endHour}:${endMinute} ${endPeriod}`
-          });
-          navigation.navigate('ActivityOverview');
-          // Navigate back or to a confirmation screen
-          // navigation.goBack() or navigation.navigate('ConfirmationScreen')
-        }}
+        onPress={handleSubmit}
       >
         <Text style={styles.saveButtonText}>Submit Record</Text>
       </TouchableOpacity>
@@ -264,27 +293,24 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
   },
-  pickerWrapper: {
-    backgroundColor: '#fff',
-    borderWidth: 1,
-    borderColor: '#d2d2d2',
-    borderRadius: 4,
-    overflow: 'hidden',
-    width: 80,
-  },
   picker: {
-    height: 50,
-    width: 180,
-    color: 'black',
-    fontSize: 6,
-
+    height: 280, // keep enough height for the wheel to work
+    marginTop: -80, // shift up to hide top items
+    marginBottom: -120, // shift down to hide bottom items
   },
-  pickerItem: {
-    fontSize: 16,
-    height: 44,
+
+  pickerWrapper: {
+    borderWidth: 1,
+    borderColor: '#ccc',
+    borderRadius: 8,
+    backgroundColor: '#fff',
+    overflow: 'hidden',
+    width: '32%',
+    marginBottom: 20,
+    height: 60,
   },
   timeSeparator: {
-    fontSize: 18,
+    fontSize: 12,
     marginHorizontal: 8,
     color: '#555',
   },

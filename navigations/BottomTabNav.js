@@ -13,7 +13,7 @@ import { COLORS } from "../constants";
 import { Create, Home, Meals, Profile, Settings } from "../screens";
 import Feather from "react-native-vector-icons/Feather"; // Import Feather icons
 import ActivityOverview from "../screens/ActivityOverview";
-import RecordSugar from "../screens/RecordSugar";
+import SugarHistory from "../screens/SugarHistory";
 
 const Tab = createBottomTabNavigator();
 
@@ -200,8 +200,8 @@ const BottomTabNav = () => {
       />
 
       <Tab.Screen
-        name="RecordSugar"
-        component={RecordSugar}
+        name="SugarHistory"
+        component={SugarHistory}
         options={{
           tabBarIcon: ({ focused }) => (
             <View
@@ -263,7 +263,7 @@ const BottomTabNav = () => {
                 height: "100%",
               }}
             >
-              <Ionicons name="stats-chart-outline" 
+              <Ionicons name="stats-chart-outline"
                 size={28}
                 color={COLORS.icon_color}
                 style={{

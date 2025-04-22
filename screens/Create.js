@@ -4,19 +4,19 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
 
 function Create({ navigation }) {
-  const [selectedActivity, setSelectedActivity] = useState(null);
+  const [selectedActivity, setSelectedActivity] = useState({ id: 0 });
 
   const activities = [
-    { id: 1, name: 'Walking', icon: require('../assets/images/walking-icon.png') },
-    { id: 2, name: 'Running', icon: require('../assets/images/run-icon.png') },
-    { id: 3, name: 'Stretching', icon: require('../assets/images/stretching-icon.png') },
-    { id: 4, name: 'Yoga', icon: require('../assets/images/yoga-icon.png') },
-    { id: 5, name: 'Sumba', icon: require('../assets/images/zumba-icon.png') },
-    { id: 6, name: 'Cycling', icon: require('../assets/images/cycling-icon.png') },
+    { id: 1, rate: 0.04, name: 'Walking', icon: require('../assets/images/walking-icon.png') },
+    { id: 2, rate: 0.17, name: 'Running', icon: require('../assets/images/run-icon.png') },
+    { id: 3, rate: 0.03, name: 'Stretching', icon: require('../assets/images/stretching-icon.png') },
+    { id: 4, rate: 0.05, name: 'Yoga', icon: require('../assets/images/yoga-icon.png') },
+    { id: 5, rate: 0.13, name: 'Sumba', icon: require('../assets/images/zumba-icon.png') },
+    { id: 6, rate: 0.12, name: 'Cycling', icon: require('../assets/images/cycling-icon.png') }
   ];
 
   const handleSelectActivity = (activity) => {
-    setSelectedActivity(activity.id);
+    setSelectedActivity(activity);
   };
 
   return (
@@ -37,7 +37,7 @@ function Create({ navigation }) {
               key={activity.id}
               style={[
                 styles.activityCard,
-                selectedActivity === activity.id && styles.selectedActivity,
+                selectedActivity.id === activity.id && styles.selectedActivity,
               ]}
               onPress={() => handleSelectActivity(activity)}
             >
@@ -47,13 +47,30 @@ function Create({ navigation }) {
           ))}
         </View>
 
-        <TouchableOpacity style={styles.trackButton} onPress={() => navigation.navigate('Walking')}>
-          <Text style={styles.trackButtonText}>Start Tracking</Text>
-        </TouchableOpacity>
+        {selectedActivity.id != 0 && (
+          <>
+            <TouchableOpacity style={styles.trackButton} onPress={() => navigation.navigate('Walking',
+              {
+                id: selectedActivity.id,
+                activity: selectedActivity.name,
+                icon: selectedActivity.icon,
+                rate: selectedActivity.rate,
+              })}>
+              <Text style={styles.trackButtonText}>Start Tracking</Text>
+            </TouchableOpacity>
 
-        <TouchableOpacity style={styles.forgotLink}>
-          <Text style={styles.forgotLinkText}>I forgot to track this activity</Text>
-        </TouchableOpacity>
+
+            <TouchableOpacity style={styles.forgotLink} onPress={() => navigation.navigate('RecordSugar',
+              {
+                id: selectedActivity.id,
+                activity: selectedActivity.name,
+                icon: selectedActivity.icon,
+                rate: selectedActivity.rate,
+              })}>
+              <Text style={styles.forgotLinkText}>I forgot to track this activity</Text>
+            </TouchableOpacity>
+          </>
+        )}
       </View>
     </SafeAreaView>
   );
@@ -136,7 +153,7 @@ const styles = StyleSheet.create({
     marginTop: -25,
     alignSelf: 'center', // <- This centers the button horizontally
   },
-  
+
   trackButtonText: {
     color: '#fff',
     fontSize: 16,

@@ -30,8 +30,8 @@ function MealPlanner({ navigation }) {
                 setMealData(data.mealPlan);
                 setMealIDs(extractMealIds(data));
             } catch (error) {
-                console.error('Login failed:', error);
-                Alert.alert('Login failed', error.message);
+                console.error('Request failed:', error);
+                Alert.alert('Request failed', error.message);
             }
         };
 

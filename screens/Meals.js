@@ -1,7 +1,9 @@
-import { View, Text, TouchableOpacity, ScrollView, SafeAreaView, Modal } from 'react-native';
-import React, { useState } from 'react';
+import { View, Text, TouchableOpacity, ScrollView, SafeAreaView, Modal, Platform } from 'react-native';
+import React, { useState, useEffect } from 'react';
 import { Feather, Ionicons } from '@expo/vector-icons';
 import DateTimePicker from '@react-native-community/datetimepicker';
+import ApiServer from './../Services/ApiServer';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 function Meals({ navigation }) {
 
@@ -10,45 +12,52 @@ function Meals({ navigation }) {
   const [toDate, setToDate] = useState(new Date());
   const [showFromPicker, setShowFromPicker] = useState(false);
   const [showToPicker, setShowToPicker] = useState(false);
+  const [templates, setTemplates] = useState([]);
 
-  const templates = [
-    {
-      id: 1,
-      name: 'Breakfast Meal 1',
-      calories: 130,
-      created: 'Created Yesterday',
-      tags: ['edit-2', 'trash-2', 'copy']
-    },
-    {
-      id: 2,
-      name: 'Breakfast Meal 2',
-      calories: 123,
-      created: 'Created 30/12/2024',
-      tags: ['edit-2', 'trash-2', 'copy']
-    },
-    {
-      id: 3,
-      name: 'Breakfast Meal 1',
-      calories: 123,
-      created: 'Created 20/12/2024',
-      tags: ['edit-2', 'trash-2', 'copy']
-    }
-  ];
+  useEffect(() => {
+    const fetchMeals = async () => {
+      try {
+        const endpoint = '/api/meal/meals';
+        const token = await AsyncStorage.getItem('token');
+        const headers = {
+          Authorization: `Bearer ${token}`
+        }
+        const data = await ApiServer.call(endpoint, 'GET', null, headers);
+        setTemplates(data.mealItems);
+      } catch (error) {
+        Alert.alert('request failed', error.message);
+      }
+    };
 
-  const getIconName = (tag) => {
-    switch (tag) {
-      case 'edit-2':
-        return 'edit-2';
-      case 'trash-2':
-        return 'trash-2';
-      case 'copy':
-        return 'copy';
-      default:
-        return 'checkmark';
-    }
+    fetchMeals();
+  }, []);
+
+  const formatDate = (dateStr) => {
+    const date = new Date(dateStr);
+    return date.toISOString().split('T')[0];
   };
 
-  const handleFilter = () => {
+  const handleFilter = async () => {
+
+    const body = {
+      fromDate: formatDate(fromDate),
+      toDate: formatDate(toDate),
+    };
+
+    const endpoint = '/api/meal/findByDateRange';
+    const token = await AsyncStorage.getItem('token');
+    const headers = {
+      Authorization: `Bearer ${token}`
+    }
+
+    ApiServer.call(endpoint, 'POST', body, headers)
+      .then(data => {
+        setTemplates(data.mealItems);
+      })
+      .catch(error => {
+        console.error('creation failed:', error);
+      });
+
     setModalVisible(false);
   };
 
@@ -65,6 +74,33 @@ function Meals({ navigation }) {
       setToDate(selectedDate);
     }
   };
+
+  const handleDelete = async (id) => {
+    try {
+      const body = {
+        id: id
+      };
+
+      const endpoint = '/api/meal/deleteMeal';
+      const token = await AsyncStorage.getItem('token');
+      const headers = {
+        Authorization: `Bearer ${token}`
+      }
+
+      const response = await ApiServer.call(endpoint, 'POST', body, headers);
+      if (response.message === "Meal deleted successfully") {
+        const request_endpoint = '/api/meal/meals';
+        const refreshedData = await ApiServer.call(request_endpoint, 'GET', null, headers);
+        setTemplates(refreshedData.mealItems);
+      }
+    } catch (error) {
+      console.error('Deletion failed:', error);
+    }
+  }
+
+  const handleClone = async (id) => {
+    navigation.navigate('EnterMealItemsClone', { id: id });
+  }
 
   const renderTemplate = (template) => (
     <View
@@ -83,36 +119,54 @@ function Meals({ navigation }) {
     >
       <View>
         <Text style={{ fontSize: 16, fontWeight: '500' }}>{template.name}</Text>
-        <Text style={{ color: '#666', fontSize: 12, marginTop: 4 }}>{template.created}</Text>
+        <Text style={{ color: '#666', fontSize: 12, marginTop: 4 }}>Created {template.date}</Text>
         <View style={{ flexDirection: 'row', marginTop: 8, gap: 8 }}>
-          
-          {template.tags.map((tag, index) => (
-            <View
-              key={index}
-              style={{
-                backgroundColor: 'rgba(24, 117, 195, 0.7)',
-                width: 24,
-                height: 24,
-                borderRadius: 5,
-                justifyContent: 'center',
-                alignItems: 'center'
-              }}
-            >
-              <TouchableOpacity>
-                <Feather
-                  name={getIconName(tag)}
-                  size={14}
-                  color="white"
-                />
-              </TouchableOpacity>
-            </View>
-          ))}
-          
+
+          <View
+            key='trash'
+            style={{
+              backgroundColor: 'rgba(24, 117, 195, 0.7)',
+              width: 24,
+              height: 24,
+              borderRadius: 5,
+              justifyContent: 'center',
+              alignItems: 'center'
+            }}
+          >
+            <TouchableOpacity onPress={() => handleDelete(template.id)}>
+              <Feather
+                name='trash-2'
+                size={14}
+                color="white"
+              />
+            </TouchableOpacity>
+          </View>
+
+          <View
+            key='copy'
+            style={{
+              backgroundColor: 'rgba(24, 117, 195, 0.7)',
+              width: 24,
+              height: 24,
+              borderRadius: 5,
+              justifyContent: 'center',
+              alignItems: 'center'
+            }}
+          >
+            <TouchableOpacity onPress={() => handleClone(template.id)}>
+              <Feather
+                name='copy'
+                size={14}
+                color="white"
+              />
+            </TouchableOpacity>
+          </View>
+
         </View>
       </View>
       <View>
         <Text style={{ color: '#4CAF50', fontSize: 22, fontWeight: '800' }}>
-          {template.calories} Cal
+          {template.totalCal} Cal
         </Text>
         <Text style={{ color: '#666', fontSize: 12, textAlign: 'right' }}>Total Sugar</Text>
       </View>
@@ -161,7 +215,7 @@ function Meals({ navigation }) {
                 elevation: 5,
               }}>
                 <Text style={{ fontSize: 20, fontWeight: 'bold', marginBottom: 20 }}>Date Filter</Text>
-                
+
                 <View style={{ width: '100%', marginVertical: 10 }}>
                   <Text style={{ fontSize: 16, marginBottom: 5 }}>From Date</Text>
                   <TouchableOpacity

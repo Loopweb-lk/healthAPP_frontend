@@ -3,26 +3,53 @@ import { View, Text, StyleSheet, TouchableOpacity, TextInput, Image, ScrollView 
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
 import Icon from 'react-native-vector-icons/Ionicons';
+import { Picker } from '@react-native-picker/picker';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import ApiServer from './../Services/ApiServer';
 
 function Add_New_Meal_ltem({ navigation }) {
   const [selectedIcon, setSelectedIcon] = useState(null);
   const [itemName, setItemName] = useState('');
   const [calories, setCalories] = useState('');
   const [quantity, setQuantity] = useState('');
+  const [selectedMealType, setSelectedMealType] = useState('Breakfast');
+  const [selectedType, setSelectedType] = useState('Veg');
 
   const icons = [
-    { id: 1, source: require('./../assets/icons/rice.png') },
-    { id: 2, source: require('./../assets/icons/tomato.png') },
-    { id: 3, source: require('./../assets/icons/sandwich.png') },
-    { id: 4, source: require('./../assets/icons/drinks.png') },
-    { id: 5, source: require('./../assets/icons/herbs.png') },
-    { id: 6, source: require('./../assets/icons/salad.png') },
+    { id: 1, name: './../assets/icons/rice.png', source: require('./../assets/icons/rice.png') },
+    { id: 2, name: './../assets/icons/tomato.png', source: require('./../assets/icons/tomato.png') },
+    { id: 3, name: './../assets/icons/sandwich.png', source: require('./../assets/icons/sandwich.png') },
+    { id: 4, name: './../assets/icons/drinks.png', source: require('./../assets/icons/drinks.png') },
+    { id: 5, name: './../assets/icons/herbs.png', source: require('./../assets/icons/herbs.png') },
+    { id: 6, name: './../assets/icons/salad.png', source: require('./../assets/icons/salad.png') },
   ];
 
-  const handleAddItem = () => {
-    // Logic to save the meal item
-    console.log('Adding meal item:', { itemName, calories, quantity, selectedIcon });
-    navigation.goBack();
+  const handleAddItem = async () => {
+    const endpoint = '/api/meal/createFoodItem';
+
+    const body = {
+      name: itemName,
+      category: selectedMealType,
+      size: quantity,
+      calorie: calories,
+      type: selectedType,
+      image: selectedIcon
+    };
+
+    const token = await AsyncStorage.getItem('token');
+    const headers = {
+      Authorization: `Bearer ${token}`
+    }
+
+    ApiServer.call(endpoint, 'POST', body, headers)
+      .then(data => {
+        if (data.message == "Food Item created successfully") {
+          navigation.goBack();
+        }
+      })
+      .catch(error => {
+        console.error('Register failed:', error);
+      });
   };
 
   return (
@@ -46,6 +73,14 @@ function Add_New_Meal_ltem({ navigation }) {
             onChangeText={setItemName}
           />
 
+          {/* Quantity */}
+          <Text style={styles.labelText}>Serving Size</Text>
+          <TextInput
+            style={styles.input}
+            value={quantity}
+            onChangeText={setQuantity}
+          />
+
           {/* Estimated Calory Level */}
           <Text style={styles.labelText}>Estimated Calory Level</Text>
           <TextInput
@@ -55,13 +90,32 @@ function Add_New_Meal_ltem({ navigation }) {
             keyboardType="numeric"
           />
 
-          {/* Quantity */}
-          <Text style={styles.labelText}>Quantity</Text>
-          <TextInput
-            style={styles.input}
-            value={quantity}
-            onChangeText={setQuantity}
-          />
+
+
+          <Text style={styles.labelText}>Meal Type</Text>
+          <View style={styles.pickerWrapper2}>
+            <Picker
+              selectedValue={selectedMealType}
+              style={styles.picker}
+              onValueChange={(value) => setSelectedMealType(value)}
+            >
+              <Picker.Item label="Breakfast" value="Breakfast" />
+              <Picker.Item label="Lunch" value="Lunch" />
+              <Picker.Item label="Dinner" value="Dinner" />
+            </Picker>
+          </View>
+
+          <Text style={styles.labelText}>Type</Text>
+          <View style={styles.pickerWrapper2}>
+            <Picker
+              selectedValue={selectedType}
+              style={styles.picker}
+              onValueChange={(value) => setSelectedType(value)}
+            >
+              <Picker.Item label="Veg" value="Veg" />
+              <Picker.Item label="Non-veg" value="Non-Veg" />
+            </Picker>
+          </View>
 
           {/* Choose Icon */}
           <Text style={styles.labelText}>Choose Icon</Text>
@@ -71,9 +125,9 @@ function Add_New_Meal_ltem({ navigation }) {
                 key={icon.id}
                 style={[
                   styles.iconContainer,
-                  selectedIcon === icon.id && styles.selectedIconContainer,
+                  selectedIcon === icon.name && styles.selectedIconContainer,
                 ]}
-                onPress={() => setSelectedIcon(icon.id)}
+                onPress={() => setSelectedIcon(icon.name)}
               >
                 <Image source={icon.source} style={styles.icon} />
               </TouchableOpacity>
@@ -81,7 +135,6 @@ function Add_New_Meal_ltem({ navigation }) {
           </View>
         </View>
 
-        {/* Add Button */}
         <TouchableOpacity style={styles.addButton} onPress={handleAddItem}>
           <Text style={styles.addButtonText}>Add</Text>
         </TouchableOpacity>
@@ -171,6 +224,23 @@ const styles = StyleSheet.create({
     color: 'white',
     fontSize: 16,
     fontWeight: 'bold',
+  },
+
+  picker: {
+    height: 280, // keep enough height for the wheel to work
+    marginTop: -80, // shift up to hide top items
+    marginBottom: -120, // shift down to hide bottom items
+  },
+
+  pickerWrapper2: {
+    borderWidth: 1,
+    borderColor: '#ccc',
+    borderRadius: 8,
+    backgroundColor: '#fff',
+    overflow: 'hidden',
+    width: '100%',
+    marginBottom: 20,
+    height: 60,
   },
 });
 

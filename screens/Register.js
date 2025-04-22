@@ -155,8 +155,8 @@ function Register({ navigation }) {
                                             setIsDropdownOpen(false);
                                         }}
                                     >
-                                        <Picker.Item label="Veg" value="veg" />
-                                        <Picker.Item label="Non-veg" value="non-veg" />
+                                        <Picker.Item label="Veg" value="Veg" />
+                                        <Picker.Item label="Non-veg" value="Non-Veg" />
                                     </Picker>
                                 </View>
                             </>

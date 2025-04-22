@@ -1,22 +1,63 @@
 import React, { useState } from 'react';
-import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
+import { View, Text, StyleSheet, TouchableOpacity, TextInput } from 'react-native';
 import { Calendar } from 'react-native-calendars';
 import { Picker } from '@react-native-picker/picker';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import ApiServer from './../Services/ApiServer';
 
-function RecordMeal({ navigation }) {
-  const [selectedDate, setSelectedDate] = useState('');
+function RecordMeal({ route, navigation }) {
+  const { selectedItems, totalCal } = route.params;
+  const [selectedDate, setSelectedDate] = useState(() => {
+    const today = new Date();
+    return today.toISOString().split('T')[0];
+  });
+
   const [selectedHour, setSelectedHour] = useState('10');
   const [selectedMinute, setSelectedMinute] = useState('00');
   const [selectedMeridiem, setSelectedMeridiem] = useState('AM');
   const [selectedMealType, setSelectedMealType] = useState('Breakfast');
+  const [itemName, setItemName] = useState('');
+
+  const saveMealRecord = async () => {
+    const date = selectedDate;
+    const timeString = `${selectedHour}:${selectedMinute} ${selectedMeridiem}`;
+    const dateTimeString = `${selectedDate} ${selectedHour}:${selectedMinute} ${selectedMeridiem}`;
+
+    const body = {
+      name: itemName,
+      date: date,
+      timestamp: dateTimeString,
+      totalCal: totalCal,
+      selectedItems: selectedItems,
+      mealType: selectedMealType
+    };
+
+    const endpoint = '/api/meal/createMeal';
+    const token = await AsyncStorage.getItem('token');
+    const headers = {
+      Authorization: `Bearer ${token}`
+    }
+
+    ApiServer.call(endpoint, 'POST', body, headers)
+      .then(data => {
+        if (data.message == "Meal created successfully") {
+          navigation.navigate('BottomTabNavigation');
+        }
+      })
+      .catch(error => {
+        console.error('creation failed:', error);
+      });
+  };
 
   return (
     <SafeAreaView style={styles.container}>
+
       <TouchableOpacity onPress={() => navigation.goBack()}>
         <Ionicons name="chevron-back" size={24} color="black" />
       </TouchableOpacity>
+
       <Text style={styles.header}>Record a Meal</Text>
 
       {/* Calendar */}
@@ -49,7 +90,6 @@ function RecordMeal({ navigation }) {
           }}
           style={styles.calendar}
           onDayPress={(day) => {
-            console.log('Selected date:', day.dateString);
             setSelectedDate(day.dateString);
           }}
         />
@@ -57,6 +97,13 @@ function RecordMeal({ navigation }) {
 
       {/* Time and Type Selectors */}
       <View style={styles.card}>
+        <Text style={styles.cardTitle}>Item Name</Text>
+        <TextInput
+          style={styles.input}
+          value={itemName}
+          onChangeText={setItemName}
+        />
+
         <Text style={styles.cardTitle}>Select Meal Time</Text>
         <View style={styles.timePickerContainer}>
 
@@ -114,15 +161,7 @@ function RecordMeal({ navigation }) {
       {/* Save Button */}
       <TouchableOpacity
         style={styles.saveButton}
-        onPress={() => {
-          console.log('Saved:', {
-            selectedDate,
-            selectedHour,
-            selectedMinute,
-            selectedMeridiem,
-            selectedMealType,
-          });
-        }}
+        onPress={saveMealRecord}
       >
         <Text style={styles.saveButtonText}>Save</Text>
       </TouchableOpacity>
@@ -210,6 +249,22 @@ const styles = StyleSheet.create({
     color: '#fff',
     fontSize: 18,
     fontWeight: 'bold',
+  },
+  formContainer: {
+    marginBottom: 24,
+  },
+  labelText: {
+    fontSize: 14,
+    color: '#666',
+    marginBottom: 8,
+  },
+  input: {
+    backgroundColor: 'white',
+    borderRadius: 8,
+    padding: 12,
+    marginBottom: 16,
+    borderWidth: 1,
+    borderColor: '#e0e0e0',
   },
 });
 

@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   View,
   Text,
@@ -11,39 +11,29 @@ import {
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
 import DateTimePicker from '@react-native-community/datetimepicker';
+import ApiServer from './../Services/ApiServer';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 function SugarHistory({ navigation }) {
-  const sugarRecords = [
-    {
-      id: '1',
-      date: '2024-12-25',
-      level: '100',
-      timing: 'Dinner',
-      notes: '',
-    },
-    {
-      id: '2',
-      date: '2024-12-26',
-      level: '100',
-      timing: 'Dinner',
-      notes:
-        'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Quisque varius turpis id vehicula faucibus. Vestibulum.',
-    },
-    {
-      id: '3',
-      date: '2024-12-28',
-      level: '100',
-      timing: 'Dinner',
-      notes: '',
-    },
-    {
-      id: '4',
-      date: '2024-12-29',
-      level: '100',
-      timing: 'Dinner',
-      notes: '',
-    },
-  ];
+  const [sugarRecords, setSugarRecords] = useState([]);
+
+  useEffect(() => {
+    const fetchMeals = async () => {
+      try {
+        const endpoint = '/api/sugar/sugar';
+        const token = await AsyncStorage.getItem('token');
+        const headers = {
+          Authorization: `Bearer ${token}`
+        }
+        const data = await ApiServer.call(endpoint, 'GET', null, headers);
+        setSugarRecords(data.records);
+      } catch (error) {
+        Alert.alert('request failed', error.message);
+      }
+    };
+
+    fetchMeals();
+  }, []);
 
   const [isFilterModalVisible, setFilterModalVisible] = useState(false);
   const [fromDate, setFromDate] = useState(new Date());
@@ -60,6 +50,36 @@ function SugarHistory({ navigation }) {
     }
     setShowFromDatePicker(false);
     setShowToDatePicker(false);
+  };
+
+  const formatDate = (date) => {
+    return date.toISOString().split('T')[0];
+  };
+
+  const handleFilter = async () => {
+
+    const body = {
+      fromDate: formatDate(fromDate),
+      toDate: formatDate(toDate),
+    };
+
+    console.log(body);
+
+    const endpoint = '/api/sugar/findByDateRange';
+    const token = await AsyncStorage.getItem('token');
+    const headers = {
+      Authorization: `Bearer ${token}`
+    }
+
+    ApiServer.call(endpoint, 'POST', body, headers)
+      .then(data => {
+        setSugarRecords(data.records);
+      })
+      .catch(error => {
+        console.error('creation failed:', error);
+      });
+
+    setFilterModalVisible(false);
   };
 
   return (
@@ -80,30 +100,38 @@ function SugarHistory({ navigation }) {
         </TouchableOpacity>
       </View>
 
-      <ScrollView style={styles.scrollView}>
-        {sugarRecords.map((item) => (
-          <View key={item.id} style={styles.recordCard}>
-            <Text style={styles.dateText}>{item.date}</Text>
-            <View style={styles.recordRow}>
-              <Text style={styles.labelText}>Sugar level</Text>
-              <Text style={styles.valueText}>: {item.level}</Text>
+      {sugarRecords && sugarRecords.length > 0 ? (
+        <ScrollView style={styles.scrollView}>
+          {sugarRecords.map((item) => (
+            <View key={item.id} style={styles.recordCard}>
+              <Text style={styles.dateText}>
+                {item.timestamp.split('T')[0]}
+              </Text>
+              <View style={styles.recordRow}>
+                <Text style={styles.labelText}>Sugar level</Text>
+                <Text style={styles.valueText}>: {item.level}</Text>
+              </View>
+              <View style={styles.recordRow}>
+                <Text style={styles.labelText}>Before</Text>
+                <Text style={styles.valueText}>: {item.meal}</Text>
+              </View>
+              {item.note ? (
+                <Text style={styles.notesText}>{item.note}</Text>
+              ) : null}
             </View>
-            <View style={styles.recordRow}>
-              <Text style={styles.labelText}>Before</Text>
-              <Text style={styles.valueText}>: {item.timing}</Text>
-            </View>
-            {item.notes ? (
-              <Text style={styles.notesText}>{item.notes}</Text>
-            ) : null}
-          </View>
-        ))}
-      </ScrollView>
+          ))}
+        </ScrollView>
+      ) : (
+        <Text style={styles.emptyText}>No records found.</Text>
+      )}
+
 
       <View style={styles.buttonContainer}>
         <TouchableOpacity style={styles.addButton} onPress={() => navigation.navigate('RecordSugar')}>
           <Text style={styles.addButtonText}>Add New Record</Text>
         </TouchableOpacity>
       </View>
+
 
       {/* Filter Modal */}
       <Modal
@@ -156,10 +184,7 @@ function SugarHistory({ navigation }) {
 
             <Pressable
               style={styles.modalButton}
-              onPress={() => {
-                // You can implement your filtering logic here
-                setFilterModalVisible(false);
-              }}
+              onPress={handleFilter}
             >
               <Text style={styles.modalButtonText}>Filter</Text>
             </Pressable>
@@ -234,12 +259,13 @@ const styles = StyleSheet.create({
   },
   buttonContainer: {
     paddingHorizontal: 16,
-    paddingVertical: 25,
+    paddingVertical: 60,
   },
   addButton: {
     backgroundColor: '#1875C3',
     borderRadius: 30,
     padding: 14,
+    mnarginBottom: 25,
     alignItems: 'center',
     justifyContent: 'center',
     height: 65,

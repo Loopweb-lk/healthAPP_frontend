@@ -1,7 +1,9 @@
 import React, { useState } from 'react';
-import { View, Text, TextInput, StyleSheet, TouchableOpacity, KeyboardAvoidingView, Platform } from 'react-native';
+import { View, Text, TextInput, StyleSheet, TouchableOpacity, TouchableWithoutFeedback, Keyboard, KeyboardAvoidingView, Platform } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
+import ApiServer from './../Services/ApiServer';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 function RecordSugar({ navigation }) {
   const [sugarValue, setSugarValue] = useState('');
@@ -9,10 +11,31 @@ function RecordSugar({ navigation }) {
   const [notes, setNotes] = useState('');
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
 
-  const handleSubmit = () => {
-    // Here you would handle saving the data
-    console.log({ sugarValue, mealType, notes });
-    navigation.goBack();
+  const handleSubmit = async () => {
+    const currentTimestamp = new Date().toISOString();
+
+    const body = {
+      level: sugarValue,
+      meal: mealType,
+      note: notes,
+      timestamp: currentTimestamp
+    }
+
+    const endpoint = '/api/sugar/createRecord';
+    const token = await AsyncStorage.getItem('token');
+    const headers = {
+      Authorization: `Bearer ${token}`
+    }
+
+    ApiServer.call(endpoint, 'POST', body, headers)
+      .then(data => {
+        if (data.message == "Sugar Log created successfully") {
+          navigation.navigate('BottomTabNavigation');
+        }
+      })
+      .catch(error => {
+        console.error('creation failed:', error);
+      });
   };
 
   const selectMealType = (meal) => {
@@ -34,59 +57,62 @@ function RecordSugar({ navigation }) {
       </View>
       <Text style={styles.headerTitle}>Record Sugar</Text>
 
-      {/* Main Content */}
-      <View style={styles.content}>
-        <Text style={styles.label}>Sugar Value</Text>
-        <TextInput
-          style={styles.input}
-          value={sugarValue}
-          onChangeText={setSugarValue}
-          keyboardType="numeric"
-          placeholder="Enter value"
-        />
+      <TouchableWithoutFeedback onPress={Keyboard.dismiss} accessible={false}>
+        {/* Main Content */}
+        <View style={styles.content}>
+          <Text style={styles.label}>Sugar Value</Text>
+          <TextInput
+            style={styles.input}
+            value={sugarValue}
+            onChangeText={setSugarValue}
+            keyboardType="numeric"
+            placeholder="Enter value"
+          />
 
-        <Text style={styles.label}>Measured Before</Text>
-        <TouchableOpacity style={styles.dropdown} onPress={toggleDropdown}>
-          <Text style={mealType ? styles.dropdownText : styles.dropdownPlaceholder}>
-            {mealType || 'Select meal'}
-          </Text>
-          <Ionicons name="chevron-down" size={20} color="gray" />
-        </TouchableOpacity>
+          <Text style={styles.label}>Measured Before</Text>
+          <TouchableOpacity style={styles.dropdown} onPress={toggleDropdown}>
+            <Text style={mealType ? styles.dropdownText : styles.dropdownPlaceholder}>
+              {mealType || 'Select meal'}
+            </Text>
+            <Ionicons name="chevron-down" size={20} color="gray" />
+          </TouchableOpacity>
 
-        {isDropdownOpen && (
-          <View style={styles.dropdownMenu}>
-            <TouchableOpacity style={styles.dropdownItem} onPress={() => selectMealType('Breakfast')}>
-              <Text>Breakfast</Text>
-            </TouchableOpacity>
-            <TouchableOpacity style={styles.dropdownItem} onPress={() => selectMealType('Lunch')}>
-              <Text>Lunch</Text>
-            </TouchableOpacity>
-            <TouchableOpacity style={styles.dropdownItem} onPress={() => selectMealType('Dinner')}>
-              <Text>Dinner</Text>
-            </TouchableOpacity>
-          </View>
-        )}
+          {isDropdownOpen && (
+            <View style={styles.dropdownMenu}>
+              <TouchableOpacity style={styles.dropdownItem} onPress={() => selectMealType('Breakfast')}>
+                <Text>Breakfast</Text>
+              </TouchableOpacity>
+              <TouchableOpacity style={styles.dropdownItem} onPress={() => selectMealType('Lunch')}>
+                <Text>Lunch</Text>
+              </TouchableOpacity>
+              <TouchableOpacity style={styles.dropdownItem} onPress={() => selectMealType('Dinner')}>
+                <Text>Dinner</Text>
+              </TouchableOpacity>
+            </View>
+          )}
 
-        <Text style={styles.label}>Notes</Text>
-        <TextInput
-          style={styles.input}
-          value={notes}
-          onChangeText={setNotes}
-          placeholder="Add notes"
-          multiline
-        />
-      </View>
+          <Text style={styles.label}>Notes</Text>
+          <TextInput
+            style={styles.input}
+            value={notes}
+            onChangeText={setNotes}
+            placeholder="Add notes"
+            multiline
+          />
+        </View>
+      </TouchableWithoutFeedback>
 
       {/* Submit Button */}
       <View style={styles.buttonContainer}>
-        <TouchableOpacity 
-          style={[styles.submitButton, sugarValue ? styles.activeButton : {}]} 
+        <TouchableOpacity
+          style={[styles.submitButton, sugarValue ? styles.activeButton : {}]}
           onPress={handleSubmit}
           disabled={!sugarValue}
         >
           <Text style={[styles.submitText, sugarValue ? styles.activeButtonText : {}]}>Submit</Text>
         </TouchableOpacity>
       </View>
+
 
       {/* Bottom Tab Bar */}
       {/* <View style={styles.tabBar}>

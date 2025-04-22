@@ -28,6 +28,7 @@ import RecordSugar from './screens/RecordSugar';
 import UserProfile from './screens/UserProfile';
 import MealsOverview from './screens/MealsOverview';
 import Notifications from './screens/Notifications';
+import EnterMealItemsClone from './screens/EnterMealItemsClone'
 
 // Prevent SplashScreen from auto-hiding until ready
 SplashScreen.preventAutoHideAsync();
@@ -112,11 +113,11 @@ export default function App() {
             <Stack.Screen name="UserProfile" component={UserProfile} />
             <Stack.Screen name="MealsOverview" component={MealsOverview} />
             <Stack.Screen name="Notifications" component={Notifications} />
-
+            <Stack.Screen name="EnterMealItemsClone" component={EnterMealItemsClone} />
 
           </>
         )}
-        
+
       </Stack.Navigator>
     </NavigationContainer>
   );

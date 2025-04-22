@@ -3,15 +3,16 @@ import { View, Text, StyleSheet, TouchableOpacity, Image } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
 
-function Walking({ navigation }) {
-  const [isPaused, setIsPaused] = useState(false);
-  const [timeInSeconds, setTimeInSeconds] = useState(2412); // 40 minutes and 12 seconds
+function Walking({ route, navigation }) {
+  const { id, activity, icon, rate } = route.params;
+  const [isPaused, setIsPaused] = useState(true);
+  const [timeInSeconds, setTimeInSeconds] = useState(0);
   const intervalRef = useRef(null);
 
   useEffect(() => {
     if (!isPaused) {
       intervalRef.current = setInterval(() => {
-        setTimeInSeconds((prevTime) => (prevTime > 0 ? prevTime + 1 : 0));
+        setTimeInSeconds((prevTime) => prevTime + 1);
       }, 1000);
     } else {
       clearInterval(intervalRef.current);
@@ -20,10 +21,28 @@ function Walking({ navigation }) {
     return () => clearInterval(intervalRef.current);
   }, [isPaused]);
 
+
   const formatTime = (seconds) => {
     const mins = Math.floor(seconds / 60);
     const secs = seconds % 60;
     return `${String(mins).padStart(2, '0')}:${String(secs).padStart(2, '0')}`;
+  };
+
+  const stoped = async () => {
+    const TotalRate = Number((rate * timeInSeconds).toFixed(2));
+    navigation.navigate('WalkingTrackEnd',
+      {
+        id: id,
+        activity: activity,
+        icon: icon,
+        rate: rate,
+        totalRate: TotalRate,
+        time: timeInSeconds
+      });
+  };
+
+  const refresh = () => {
+    setTimeInSeconds(0);
   };
 
   return (
@@ -38,12 +57,12 @@ function Walking({ navigation }) {
       </View>
 
       {/* Activity Title */}
-      <Text style={styles.activityTitle}>Walking</Text>
+      <Text style={styles.activityTitle}>{activity}</Text>
 
       {/* Runner Illustration */}
       <View style={styles.illustrationContainer}>
         <Image
-          source={require('../assets/images/walking-icon.png')}
+          source={icon}
           style={styles.illustration}
         />
       </View>
@@ -55,12 +74,30 @@ function Walking({ navigation }) {
       </View>
 
       {/* Pause/Play Button */}
-      <TouchableOpacity 
-        style={styles.pauseButton}
-        onPress={() => setIsPaused(!isPaused)}
-      >
-        <Ionicons name={isPaused ? "play" : "pause"} size={30} color="white" />
-      </TouchableOpacity>
+      <View style={{ flexDirection: 'row', justifyContent: 'center', gap: 20 }}>
+
+        <TouchableOpacity
+          style={styles.pauseButton}
+          onPress={() => refresh()}
+        >
+          <Ionicons name="refresh" size={30} color="white" />
+        </TouchableOpacity>
+
+        <TouchableOpacity
+          style={styles.pauseButton}
+          onPress={() => setIsPaused(!isPaused)}
+        >
+          <Ionicons name={isPaused ? "play" : "pause"} size={30} color="white" />
+        </TouchableOpacity>
+
+        <TouchableOpacity
+          style={styles.stopButton}
+          onPress={() => stoped()}
+        >
+          <Ionicons name="stop" size={30} color="white" />
+        </TouchableOpacity>
+      </View>
+
     </SafeAreaView>
   );
 }
@@ -122,6 +159,17 @@ const styles = StyleSheet.create({
     height: 95,
     borderRadius: 50,
     backgroundColor: '#1875C3',
+    alignItems: 'center',
+    justifyContent: 'center',
+    alignSelf: 'center',
+    marginVertical: 20,
+  },
+
+  stopButton: {
+    width: 95,
+    height: 95,
+    borderRadius: 50,
+    backgroundColor: '#C31818FF',
     alignItems: 'center',
     justifyContent: 'center',
     alignSelf: 'center',

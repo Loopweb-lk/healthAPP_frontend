@@ -1,9 +1,44 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { View, Text, StyleSheet, TouchableOpacity, Image } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
+import ApiServer from './../Services/ApiServer';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
-function WalkingTrackEnd({ navigation }) {
+function WalkingTrackEnd({ route, navigation }) {
+  const { id, activity, icon, rate, totalRate, time } = route.params;
+
+  useEffect(() => {
+    const saveActivityRecord = async () => {
+      const currentTimestamp = new Date().toISOString();
+
+      const body = {
+        activity: activity,
+        timePeriod: time,
+        timestamp: currentTimestamp,
+        burnedCal: totalRate
+      }
+
+      const endpoint = '/api/activity/createActivity';
+      const token = await AsyncStorage.getItem('token');
+      const headers = {
+        Authorization: `Bearer ${token}`
+      }
+
+      ApiServer.call(endpoint, 'POST', body, headers)
+        .then(data => {
+          if (data.message == "Activity Log created successfully") {
+
+          }
+        })
+        .catch(error => {
+          console.error('creation failed:', error);
+        });
+    };
+
+    saveActivityRecord();
+  }, []);
+
   return (
     <SafeAreaView style={styles.container}>
       {/* Header */}
@@ -20,7 +55,7 @@ function WalkingTrackEnd({ navigation }) {
         {/* Running Figure */}
         <View style={styles.illustrationContainer}>
           <Image
-            source={require('../assets/images/walking-icon.png')}
+            source={icon}
             style={styles.runningFigure}
           // Alternatively, you could use an SVG component here
           />
@@ -29,13 +64,16 @@ function WalkingTrackEnd({ navigation }) {
         {/* Calorie Information */}
         <View style={styles.calorieInfo}>
           <Text style={styles.calorieLabel}>You've burnt</Text>
-          <Text style={styles.calorieValue}>123<Text style={styles.calorieUnit}>cal</Text></Text>
-          <Text style={styles.equivalentText}>Equivalent to 3 boiled eggs</Text>
+          <Text style={styles.calorieValue}>{totalRate}<Text style={styles.calorieUnit}>cal</Text></Text>
         </View>
 
         {/* Stats Button */}
         <TouchableOpacity style={styles.statsButton}>
           <Text style={styles.statsButtonText}>View Statistics</Text>
+        </TouchableOpacity>
+
+        <TouchableOpacity style={styles.statsButton} onPress={() => { navigation.navigate('BottomTabNavigation') }}>
+          <Text style={styles.statsButtonText}>Back Home</Text>
         </TouchableOpacity>
       </View>
 
