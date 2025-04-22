@@ -146,7 +146,7 @@ function Home({ navigation }) {
               <Text style={styles.appointmentText}>31th Nov</Text>
               <Text style={styles.appointmentSubtext}>Doctor Checkup</Text>
             </View>
-            <TouchableOpacity style={styles.floatingAddButton}>
+            <TouchableOpacity style={styles.floatingAddButton} onPress={() => { navigation.navigate("Calender") }}>
               <MaterialIcons name="add-circle-outline" size={39} color="rgba(68, 92, 113, 1)" />
             </TouchableOpacity>
           </View>

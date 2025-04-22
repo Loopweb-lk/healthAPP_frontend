@@ -119,6 +119,7 @@ function Calender({ navigation }) {
       >
         <View style={modalStyles.modalBackground}>
           <View style={modalStyles.modalContainer}>
+
             <Text style={modalStyles.modalTitle}>Add Event</Text>
 
             <TextInput
@@ -181,43 +182,51 @@ function Calender({ navigation }) {
                 </Text>
               </TouchableOpacity>
             </View>
+            {/* Date Picker */}
+
+            <View style={{ marginLeft: -8, marginTop: 15 }}>
+              {showDatePicker && (
+                <DateTimePicker
+                  style={{ backgroundColor: '#9B9898FF' }}
+                  value={dateObject}
+                  mode="date"
+                  display={Platform.OS === 'ios' ? 'spinner' : 'default'}
+                  onChange={(event, selected) => {
+                    setShowDatePicker(false);
+                    if (selected) {
+                      const isoDate = selected.toISOString().split('T')[0];
+                      setDateObject(selected);
+                      setSelectedDate(isoDate);
+                    }
+                  }}
+                />
+              )}
+
+              {/* Time Picker */}
+              {showTimePicker && (
+                <DateTimePicker
+                  style={{ backgroundColor: '#9B9898FF' }}
+                  value={timeObject}
+                  mode="time"
+                  is24Hour={false}
+                  display={Platform.OS === 'ios' ? 'spinner' : 'default'}
+                  onChange={(event, selected) => {
+                    setShowTimePicker(false);
+                    if (selected) {
+                      setTimeObject(selected);
+                      setEventTime(formatTime(selected));
+                    }
+                  }}
+                />
+              )}
+
+            </View>
+
           </View>
         </View>
       </Modal>
 
-      {/* Date Picker */}
-      {showDatePicker && (
-        <DateTimePicker
-          value={dateObject}
-          mode="date"
-          display={Platform.OS === 'ios' ? 'spinner' : 'default'}
-          onChange={(event, selected) => {
-            setShowDatePicker(false);
-            if (selected) {
-              const isoDate = selected.toISOString().split('T')[0];
-              setDateObject(selected);
-              setSelectedDate(isoDate);
-            }
-          }}
-        />
-      )}
 
-      {/* Time Picker */}
-      {showTimePicker && (
-        <DateTimePicker
-          value={timeObject}
-          mode="time"
-          is24Hour={false}
-          display={Platform.OS === 'ios' ? 'spinner' : 'default'}
-          onChange={(event, selected) => {
-            setShowTimePicker(false);
-            if (selected) {
-              setTimeObject(selected);
-              setEventTime(formatTime(selected));
-            }
-          }}
-        />
-      )}
     </SafeAreaView>
   );
 }
