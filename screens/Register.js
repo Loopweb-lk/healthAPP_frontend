@@ -62,7 +62,7 @@ function Register({ navigation }) {
         ApiServer.call(endpoint, 'POST', body)
             .then(data => {
                 if (data.message == "User registered successfully") {
-                    navigation.navigate('BottomTabNavigation');
+                    navigation.navigate('Login');
                 }
             })
             .catch(error => {

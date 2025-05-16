@@ -60,7 +60,7 @@ function Create({ navigation }) {
             </TouchableOpacity>
 
 
-            <TouchableOpacity style={styles.forgotLink} onPress={() => navigation.navigate('RecordSugar',
+            <TouchableOpacity style={styles.forgotLink} onPress={() => navigation.navigate('EnterActivityTime',
               {
                 id: selectedActivity.id,
                 activity: selectedActivity.name,
