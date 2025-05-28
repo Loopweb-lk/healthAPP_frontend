@@ -7,6 +7,7 @@ import {
   SafeAreaView,
   Modal,
   TextInput,
+  Linking,
 } from 'react-native';
 import { createStackNavigator } from '@react-navigation/stack';
 import { NavigationContainer } from '@react-navigation/native';
@@ -78,6 +79,27 @@ function EmergencyContacts({ navigation }) {
     navigation.navigate('BottomTabNavigation');
   };
 
+  const handleDelete = async (id) => {
+    try {
+      const body = {
+        id: id
+      };
+
+      const endpoint = '/api/general/deleteContact';
+      const token = await AsyncStorage.getItem('token');
+      const headers = {
+        Authorization: `Bearer ${token}`
+      }
+
+      const response = await ApiServer.call(endpoint, 'POST', body, headers);
+      if (response.message === "Contact deleted successfully") {
+        getContacts();
+      }
+    } catch (error) {
+      console.error('Deletion failed:', error);
+    }
+  }
+
   return (
     <SafeAreaView style={styles.container}>
       <View style={styles.content}>
@@ -90,7 +112,8 @@ function EmergencyContacts({ navigation }) {
           <TouchableOpacity
             key={contact.id}
             style={styles.contactCard}
-            onPress={() => console.log(`Edit contact ${contact.id}`)}
+            onPress={() => Linking.openURL(`tel:${contact.number}`)}
+            onLongPress={() => handleDelete(contact.id)}
           >
             <Text style={styles.contactName}>{contact.name}</Text>
             <Text style={styles.contactPhone}>{contact.number}</Text>
