@@ -99,39 +99,7 @@ function MealPlanner({ navigation }) {
                 <Text style={styles.groceryButtonText}>Go to grocery list</Text>
             </TouchableOpacity>
 
-            <View style={styles.bottomNav}>
-                <TouchableOpacity style={styles.navItem}>
-                    <Feather name="home" size={24} color={COLORS.icon_color} />
-                    <Text style={styles.navText}>Home</Text>
-                    <View
-                        style={{
-                            width: 40, // Width of the underline
-                            height: 3,
-                            backgroundColor: '#b4ddff',
-                            marginTop: 4,
-                            borderRadius: 1,
-                            marginLeft: 1,
-                            top: 0, // Move underline closer to the label
-                        }}
-                    />
-                </TouchableOpacity>
-                <TouchableOpacity style={styles.navItem}>
-                    <Ionicons name="restaurant-outline" size={24} color="#666" />
-                    <Text style={styles.navText}>Meals</Text>
-                </TouchableOpacity>
-                <TouchableOpacity style={styles.navItem}>
-                    <Ionicons name="fitness-outline" size={24} color="#666" />
-                    <Text style={styles.navText}>Create</Text>
-                </TouchableOpacity>
-                <TouchableOpacity style={styles.navItem}>
-                    <Ionicons name="water-outline" size={24} color="#666" />
-                    <Text style={styles.navText}>Sugar</Text>
-                </TouchableOpacity>
-                <TouchableOpacity style={styles.navItem}>
-                    <Ionicons name="stats-chart-outline" size={24} color="#666" />
-                    <Text style={styles.navText}>Analytics</Text>
-                </TouchableOpacity>
-            </View>
+ 
         </SafeAreaView>
     );
 }

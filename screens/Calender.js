@@ -85,8 +85,27 @@ function Calender({ navigation }) {
         return acc;
       }, {});
 
-      setAppointments(mappedData);
+      const filteredData = mappedData.filter(event => {
+        const daysMore = event.daysMore.toLowerCase().trim();
+
+        if (daysMore.endsWith('ago')) {
+          const days = parseInt(daysMore.split(' ')[0], 10);
+          return days <= 90;
+        }
+
+        if (daysMore.startsWith('in')) {
+          return true;
+        }
+
+        if (daysMore === 'today') {
+          return true;
+        }
+
+        return false;
+      });
+      setAppointments(filteredData);
       setmarkedDates(temp);
+
     } catch (error) {
       Alert.alert('request failed', error.message);
     }
@@ -109,12 +128,13 @@ function Calender({ navigation }) {
 
     try {
       const data = await ApiServer.call(endpoint, 'POST', body, headers);
-      if (data.message === "Sugar Log created successfully") {
+      if (data.message === "Event created successfully") {
         await getEvents();
         setEventName('');
         setEventTime('');
         setSelectedDate('');
         setModalVisible(false);
+        navigation.navigate('BottomTabNavigation');
       }
     } catch (error) {
       console.error('creation failed:', error);
@@ -127,9 +147,12 @@ function Calender({ navigation }) {
 
   return (
     <SafeAreaView style={styles.container}>
-      <TouchableOpacity onPress={() => navigation.goBack()}>
-        <Ionicons name="chevron-back" size={24} color="black" />
+      <TouchableOpacity onPress={() => console.log('data')}>
+        <View>
+          <Ionicons name="chevron-back" size={24} color="black" />
+        </View>
       </TouchableOpacity>
+
       <Text style={styles.header}>Calender</Text>
 
       {/* Calendar */}

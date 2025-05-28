@@ -26,8 +26,24 @@ function Login({ navigation }) {
     const [modalVisible, setModalVisible] = useState(false);
     const [resetEmail, setResetEmail] = useState('');
 
-    const handleResetPassword = () => {
-        navigation.navigate('ResetPassword')
+    const handleResetPassword = async () => {
+        setModalVisible(false);
+
+        const endpoint = '/api/general/getPasswordResetLogin';
+
+        const body = {
+            email: formData.resetEmail,
+        }
+
+        try {
+            const data = await ApiServer.call(endpoint, 'POST', body);
+            console.log(data);
+        } catch (error) {
+            console.error('Login error:', error);
+            Alert.alert('Login failed', 'Something went wrong. Please try again.');
+        }
+
+        navigation.navigate('ResetpasswordLogin')
     };
 
     const login = async () => {

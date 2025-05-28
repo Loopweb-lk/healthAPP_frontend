@@ -67,39 +67,10 @@ function WalkingTrackEnd({ route, navigation }) {
           <Text style={styles.calorieValue}>{totalRate}<Text style={styles.calorieUnit}>cal</Text></Text>
         </View>
 
-        {/* Stats Button */}
-        <TouchableOpacity style={styles.statsButton}>
-          <Text style={styles.statsButtonText}>View Statistics</Text>
-        </TouchableOpacity>
-
         <TouchableOpacity style={styles.statsButton} onPress={() => { navigation.navigate('BottomTabNavigation') }}>
           <Text style={styles.statsButtonText}>Back Home</Text>
         </TouchableOpacity>
       </View>
-
-      {/* Bottom Navigation */}
-      {/* <View style={styles.bottomNav}>
-        <TouchableOpacity style={styles.navItem}>
-          <Ionicons name="home-outline" size={24} color="#8E8E8E" />
-          <Text style={styles.navText}>Home</Text>
-        </TouchableOpacity>
-        <TouchableOpacity style={styles.navItem}>
-          <Ionicons name="fast-food-outline" size={24} color="#8E8E8E" />
-          <Text style={styles.navText}>Diet</Text>
-        </TouchableOpacity>
-        <TouchableOpacity style={styles.navItem}>
-          <Ionicons name="fitness-outline" size={24} color="#8E8E8E" />
-          <Text style={styles.navText}>Exercise</Text>
-        </TouchableOpacity>
-        <TouchableOpacity style={styles.navItem}>
-          <Ionicons name="person-outline" size={24} color="#8E8E8E" />
-          <Text style={styles.navText}>Profile</Text>
-        </TouchableOpacity>
-        <TouchableOpacity style={styles.navItem}>
-          <Ionicons name="stats-chart-outline" size={24} color="#8E8E8E" />
-          <Text style={styles.navText}>Stats</Text>
-        </TouchableOpacity>
-      </View> */}
     </SafeAreaView>
   );
 }

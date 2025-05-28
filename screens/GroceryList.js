@@ -79,7 +79,6 @@ function GroceryList({ navigation, route }) {
           <Ionicons name="chevron-back" size={24} color="black" />
         </TouchableOpacity>
         <Text style={styles.headerTitle}>Grocery List</Text>
-        <View style={styles.headerRight} />
       </View>
 
       <ScrollView style={styles.content}>
@@ -90,6 +89,11 @@ function GroceryList({ navigation, route }) {
         ) : (
           <View></View>
         )}
+
+        <View style={{ flexDirection: 'row', justifyContent: 'space-between', paddingBottom: '15' }}>
+          <Text style={{ fontWeight: 'bold' }}>Ingredient</Text>
+          <Text style={{ fontWeight: 'bold' }}>No of Meals</Text>
+        </View>
 
         {Object.keys(ingredientData).length !== 0 && !loading ? (
           renderSection(ingredientData.ingredients)
@@ -105,28 +109,6 @@ function GroceryList({ navigation, route }) {
 
       </ScrollView>
 
-      <View style={styles.bottomNav}>
-        <TouchableOpacity style={styles.navItem}>
-          <Ionicons name="home-outline" size={24} color="gray" />
-          <Text style={styles.navText}>Home</Text>
-        </TouchableOpacity>
-        <TouchableOpacity style={styles.navItem}>
-          <Ionicons name="restaurant-outline" size={24} color="gray" />
-          <Text style={styles.navText}>Meals</Text>
-        </TouchableOpacity>
-        <TouchableOpacity style={styles.navItem}>
-          <Ionicons name="fitness-outline" size={24} color="gray" />
-          <Text style={styles.navText}>Exercise</Text>
-        </TouchableOpacity>
-        <TouchableOpacity style={styles.navItem}>
-          <Ionicons name="water-outline" size={24} color="gray" />
-          <Text style={styles.navText}>Sugar</Text>
-        </TouchableOpacity>
-        <TouchableOpacity style={styles.navItem}>
-          <Ionicons name="stats-chart-outline" size={24} color="gray" />
-          <Text style={styles.navText}>Analytics</Text>
-        </TouchableOpacity>
-      </View>
     </SafeAreaView>
   );
 };

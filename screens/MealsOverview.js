@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
     View,
     Text,
@@ -10,70 +10,98 @@ import {
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
 import { LineChart } from 'react-native-gifted-charts';
+import ApiServer from './../Services/ApiServer';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 function MealsOverview({ navigation }) {
     const [timeframe, setTimeframe] = useState('week');
     const screenWidth = Dimensions.get('window').width - 30;
+    const [calorieData, setCalorieData] = useState([]);
+    const [calorieMonthData, setCalorieMonthData] = useState([]);
+    const [sugarData, setSugarData] = useState([]);
+    const [sugarMonthData, setSugarMonthData] = useState([]);
+    const [todaySummary, setTodaySummary] = useState([]);
+    const [monthlySummary, setMonthlySummary] = useState([]);
 
-    const calorieData = [
-        { value: 30, label: 'SUN' },
-        { value: 80, label: 'MON' },
-        { value: 120, label: 'TUE' },
-        {
-            value: 68,
-            label: 'WED',
-            dataPointText: '68',
-            showStrip: true,
-            showDataPoint: true,
-        },
-        { value: 80, label: 'THU' },
-        { value: 95, label: 'FRI' },
-        { value: 90, label: 'SAT' },
-    ];
+    // const calorieData = [
+    //     { value: 30, label: 'SUN' },
+    //     { value: 80, label: 'MON' },
+    //     { value: 120, label: 'TUE' },
+    //     { value: 68, label: 'WED' },
+    //     { value: 80, label: 'THU' },
+    //     { value: 95, label: 'FRI' },
+    //     { value: 90, label: 'SAT' },
+    // ];
 
-    const calorieMonthData = [
-        { value: 30, label: 'Week1' },
-        { value: 30, label: 'Week2' },
-        { value: 120, label: 'Week3' },
-        {
-            value: 68,
-            label: 'Week4',
-            dataPointText: '68',
-            showStrip: true,
-            showDataPoint: true,
-        },
-        { value: 80, label: 'Week5' },
-        { value: 150, label: 'Week6' },
-        { value: 25, label: 'Week7' },
-    ];
+    // const calorieMonthData = [
+    //     { value: 30, label: 'Week1' },
+    //     { value: 30, label: 'Week2' },
+    //     { value: 120, label: 'Week3' },
+    //     { value: 68, label: 'Week4' },
+    //     { value: 80, label: 'Week5' },
+    //     { value: 150, label: 'Week6' },
+    //     { value: 25, label: 'Week7' },
+    // ];
 
-    const sugarData = [
-        { value: 20, label: 'SUN' },
-        { value: 70, label: 'MON' },
-        { value: 100, label: 'TUE' },
-        {
-            value: 98,
-            label: 'WED',
-            dataPointText: '75',
-            showDataPoint: true,
-        },
-        { value: 65, label: 'THU' },
-        { value: 90, label: 'FRI' },
-        { value: 85, label: 'SAT' },
-    ];
+    // const sugarData = [
+    //     { value: 20, label: 'SUN' },
+    //     { value: 70, label: 'MON' },
+    //     { value: 100, label: 'TUE' },
+    //     { value: 98, label: 'WED' },
+    //     { value: 65, label: 'THU' },
+    //     { value: 90, label: 'FRI' },
+    //     { value: 85, label: 'SAT' },
+    // ];
 
-    const todaySummary = [
-        { meal: 'Breakfast', calory: 68, sugar: 75 },
-        { meal: 'Lunch', calory: 68, sugar: 75 },
-    ];
+    // const sugarMonthData = [
+    //     { value: 30, label: 'Week1' },
+    //     { value: 30, label: 'Week2' },
+    //     { value: 120, label: 'Week3' },
+    //     { value: 68, label: 'Week4' },
+    //     { value: 80, label: 'Week5' },
+    //     { value: 150, label: 'Week6' },
+    //     { value: 25, label: 'Week7' },
+    // ];
 
-    const monthlySummary = [
-        { day: 'Monday', calory: 80, sugar: 70 },
-        { day: 'Tuesday', calory: 100, sugar: 90 },
-        { day: 'Wednesday', calory: 95, sugar: 85 },
-        { day: 'Thursday', calory: 110, sugar: 100 },
-        { day: 'Friday', calory: 120, sugar: 105 },
-    ];
+    // const todaySummary = [
+    //     { meal: 'Breakfast', calory: 68, sugar: 75 },
+    //     { meal: 'Lunch', calory: 68, sugar: 75 },
+    // ];
+
+    // const monthlySummary = [
+    //     { day: 'Monday', calory: 80, sugar: 70 },
+    //     { day: 'Tuesday', calory: 100, sugar: 90 },
+    //     { day: 'Wednesday', calory: 95, sugar: 85 },
+    //     { day: 'Thursday', calory: 110, sugar: 100 },
+    //     { day: 'Friday', calory: 120, sugar: 105 },
+    // ];
+
+    useEffect(() => {
+
+        const getData = async () => {
+            try {
+                const endpoint = '/api/general/getMealOverview';
+                const token = await AsyncStorage.getItem('token');
+                const headers = {
+                    Authorization: `Bearer ${token}`
+                }
+                const data = await ApiServer.call(endpoint, 'GET', null, headers);
+                setCalorieData(data.calorieData);
+                setCalorieMonthData(data.calorieMonthData);
+                setSugarData(data.sugarData);
+                setSugarMonthData(data.sugarMonthData);
+                setTodaySummary(data.todaySummary);
+                setMonthlySummary(data.monthlySummary);
+
+            } catch (error) {
+                console.error('request failed', error.message);
+            }
+        };
+
+        getData();
+    }, []);
+
+
 
     return (
         <SafeAreaView style={styles.container}>
@@ -229,7 +257,7 @@ function MealsOverview({ navigation }) {
                     <>
                         <View style={styles.summaryCard}>
                             <View style={styles.summaryHeader}>
-                                <Text style={styles.summaryTitle}>Weekdays Summary</Text>
+                                <Text style={styles.summaryTitle}>Weekly Summary</Text>
                                 <View style={styles.legendContainer}>
                                     <Text style={styles.caloryLegend}>Calory</Text>
                                     <Text style={styles.sugarLegend}>Sugar</Text>

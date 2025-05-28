@@ -292,10 +292,10 @@ function Meals({ navigation }) {
 
           {/* Rest of your existing code */}
           <Text style={{ fontSize: 32, fontWeight: 'bold', color: '#2196F3', marginBottom: 16, textAlign: 'center' }}>
-            Select a Template{'\n'}or Create New
+            Your Meal Records
           </Text>
 
-          <Text style={{ fontSize: 16, color: '#666', marginBottom: 12 }}>Saved Templates</Text>
+          <Text style={{ fontSize: 16, color: '#666', marginBottom: 12 }}>Saved Records</Text>
           <ScrollView showsVerticalScrollIndicator={false}>
             {templates.map(template => renderTemplate(template))}
           </ScrollView>

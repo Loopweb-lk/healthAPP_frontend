@@ -1,59 +1,39 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { View, Text, StyleSheet, TouchableOpacity, ScrollView, Dimensions } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
 import { LineChart } from 'react-native-gifted-charts';
+import ApiServer from './../Services/ApiServer';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 function ActivityOverview({ navigation }) {
   const [timeframe, setTimeframe] = useState('week');
-
+  const [calorieData, setCalorieData] = useState([]);
+  const [calorieMonthData, setCalorieMonthData] = useState([]);
+  const [activityData, setActivityData] = useState([]);
   const screenWidth = Dimensions.get('window').width - 70;
 
-  // Chart data for react-native-gifted-charts
-  const lineData = [
-    { value: 150, label: 'SUN' },
-    { value: 220, label: 'MON' },
-    { value: 260, label: 'TUE' },
-    { value: 290, label: 'WED', showVerticalLine: true },
-    { value: 350, label: 'THU' },
-    { value: 330, label: 'FRI' },
-    { value: 300, label: 'SAT' },
-  ];
+  useEffect(() => {
 
-  // Sample data for calorie and sugar chart (replace these with real data)
-  const calorieData = [
-    { value: 150, label: 'SUN' },
-    { value: 200, label: 'MON' },
-    { value: 250, label: 'TUE' },
-    { value: 220, label: 'WED' },
-    { value: 280, label: 'THU' },
-    { value: 300, label: 'FRI' },
-    { value: 270, label: 'SAT' },
-  ];
+    const getData = async () => {
+      try {
+        const endpoint = '/api/general/getActivityOverview';
+        const token = await AsyncStorage.getItem('token');
+        const headers = {
+          Authorization: `Bearer ${token}`
+        }
+        const data = await ApiServer.call(endpoint, 'GET', null, headers);
+        setCalorieData(data.calorieData);
+        setCalorieMonthData(data.calorieMonthData);
+        setActivityData(data.activityData);
 
-  const sugarData = [
-    { value: 50, label: 'SUN' },
-    { value: 60, label: 'MON' },
-    { value: 70, label: 'TUE' },
-    { value: 65, label: 'WED' },
-    { value: 75, label: 'THU' },
-    { value: 80, label: 'FRI' },
-    { value: 55, label: 'SAT' },
-  ];
+      } catch (error) {
+        console.error('request failed', error.message);
+      }
+    };
 
-  const calorieMonthData = [
-    { value: 1500, label: 'Week 1' },
-    { value: 1800, label: 'Week 2' },
-    { value: 2000, label: 'Week 3' },
-    { value: 1700, label: 'Week 4' },
-  ];
-
-  const activityData = [
-    { day: 'Monday', activities: [{ type: 'Running', duration: '30 Minutes', calories: 50 }, { type: 'Yoga', duration: '20 Minutes', calories: 50 }] },
-    { day: 'Tuesday', activities: [{ type: 'Running', duration: '40 Minutes', calories: 50 }] },
-    { day: 'Wednesday', activities: [{ type: 'Running', duration: '35 Minutes', calories: 50 }] },
-    { day: 'Friday', activities: [{ type: 'Cycling', duration: '30 Minutes', calories: 25 }, { type: 'Yoga', duration: '25 Minutes', calories: 55 }] },
-  ];
+    getData();
+  }, []);
 
   return (
     <SafeAreaView style={styles.container}>
@@ -84,8 +64,6 @@ function ActivityOverview({ navigation }) {
 
       <View style={styles.caloriesSection}>
         <Text style={styles.caloriesTitle}>Calories Burned</Text>
-        <Text style={styles.caloriesTotal}>1,840 kcal</Text>
-
         <View style={styles.caloriesSection}>
           {timeframe === 'week' ? (
             <LineChart
@@ -93,7 +71,7 @@ function ActivityOverview({ navigation }) {
               height={180}
               spacing={(screenWidth - 20) / (calorieData.length - 1)}
               initialSpacing={10}
-              maxValue={400}
+              maxValue={100}
               noOfSections={4}
               yAxisColor="transparent"
               xAxisColor="lightgray"
@@ -105,7 +83,6 @@ function ActivityOverview({ navigation }) {
               rulesType="dashed"
               xAxisIndicesHeight={10}
               data={calorieData}
-              data2={sugarData}
               data2Color="#F47174"
               color="#40B4F7"
               thickness={2}
@@ -138,7 +115,6 @@ function ActivityOverview({ navigation }) {
               rulesType="dashed"
               xAxisIndicesHeight={10}
               data={calorieMonthData}
-              data2={sugarData}
               data2Color="#F47174"
               color="#40B4F7"
               thickness={2}
@@ -158,7 +134,7 @@ function ActivityOverview({ navigation }) {
       </View>
 
       <View style={styles.summaryContainer}>
-        <Text style={styles.summaryTitle}>Weekly Summary</Text>
+        <Text style={styles.summaryTitle}>Current Week Summary</Text>
         <ScrollView style={styles.activitiesList}>
           {activityData.map((dayData, index) => (
             <View key={index} style={styles.daySection}>
@@ -175,7 +151,7 @@ function ActivityOverview({ navigation }) {
                   </View>
                   <View style={styles.activityDetails}>
                     <Text style={styles.activityType}>{activity.type}</Text>
-                    <Text style={styles.activityDuration}>{activity.duration}</Text>
+                    <Text style={styles.activityDuration}>{activity.duration}s</Text>
                   </View>
                   <View style={styles.caloriesInfo}>
                     <Text style={styles.caloriesAmount}>{activity.calories} Cal</Text>

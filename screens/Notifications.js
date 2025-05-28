@@ -1,24 +1,75 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { View, Text, StyleSheet, TouchableOpacity, ScrollView } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { Ionicons } from '@expo/vector-icons';
+import { Feather, Ionicons } from '@expo/vector-icons';
+import ApiServer from './../Services/ApiServer';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 function Notifications({ navigation }) {
+  const [notifications, setNotifications] = useState([]);
+
+  useEffect(() => {
+    getNotifications();
+  }, []);
+
+  const getNotifications = async () => {
+
+    try {
+      const endpoint = '/api/general/getNotifications';
+      const token = await AsyncStorage.getItem('token');
+      const headers = {
+        Authorization: `Bearer ${token}`
+      }
+      const data = await ApiServer.call(endpoint, 'GET', null, headers);
+      setNotifications(data.notifications)
+
+    } catch (error) {
+      console.error('request failed', error.message);
+    }
+  };
+
+  const handleDelete = async (id) => {
+    try {
+      const body = {
+        id: id
+      };
+
+      const endpoint = '/api/general/deleteNotifications';
+      const token = await AsyncStorage.getItem('token');
+      const headers = {
+        Authorization: `Bearer ${token}`
+      }
+
+      const response = await ApiServer.call(endpoint, 'POST', body, headers);
+      if (response.message === "notification deleted successfully") {
+        getNotifications();
+      }
+    } catch (error) {
+      console.error('Deletion failed:', error);
+    }
+  }
+
+
   return (
     <SafeAreaView style={styles.container}>
       <ScrollView style={styles.scrollView}>
         <View style={styles.headerContainer}>
           <Text style={styles.headerTitle}>All notifications</Text>
         </View>
-        
-        <TouchableOpacity style={styles.notificationItem}>
-          <View style={styles.notificationContent}>
-            <Text style={styles.notificationTitle}>Complete Your profile</Text>
-            <Text style={styles.notificationSubtitle}>
-              Complete Your profile and let's start tracking your meals
-            </Text>
-          </View>
-        </TouchableOpacity>
+
+        {notifications.map(notification => (
+          <TouchableOpacity
+            key={notification.id}
+            style={styles.notificationItem}
+            onPress={() => handleDelete(notification.id)}
+          >
+            <View style={styles.notificationContent}>
+              <Text style={styles.notificationTitle}>{notification.title}</Text>
+              <Text style={styles.notificationSubtitle}>{notification.msg}</Text>
+            </View>
+          </TouchableOpacity>
+        ))}
+
       </ScrollView>
     </SafeAreaView>
   );

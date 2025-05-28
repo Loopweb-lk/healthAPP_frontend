@@ -22,6 +22,20 @@ function Home({ navigation }) {
   const [meal, setMeal] = useState(null);
   const [event, setEvent] = useState([]);
   const [nextEvent, setNextEvent] = useState(0);
+  const [tipIndex, setTipIndex] = useState(0);
+
+  const tips = [
+    'Check your blood sugar levels on schedule.',
+    'Stay consistent with your insulin or other medications.',
+    'Record what you eat to track carbs and nutrition.',
+    'Stay hydrated — aim for 8 glasses a day.',
+    'Get some activity — even a short walk helps!',
+    'Keep healthy snacks ready for busy days.',
+    'Book and attend your diabetes checkups.',
+    'Take a few deep breaths to reduce stress.',
+    'Aim for 7–9 hours of restful sleep tonight.',
+    'Celebrate every healthy choice you make!',
+  ];
 
   const getClosestEvent = (events) => {
     const currentDate = new Date();
@@ -58,10 +72,20 @@ function Home({ navigation }) {
         const closestEvent = getClosestEvent(data.event);
         setNextEvent(closestEvent.daysToEvent);
 
+        if (sugar.level <= 120) {
+          const intervalId = setInterval(() => {
+            setTipIndex((prevIndex) => (prevIndex + 1) % tips.length);
+          }, 30000);
+
+          return () => clearInterval(intervalId);
+        }
+
       } catch (error) {
         Alert.alert('request failed', error.message);
       }
     };
+
+
 
     fetchData();
   }, []);
@@ -102,7 +126,7 @@ function Home({ navigation }) {
       <TouchableOpacity style={styles.settingsItem} onPress={() => navigation.navigate('EmergencyContacts')}>
         <Text style={styles.settingsText}>Emergency Contacts</Text>
       </TouchableOpacity>
-      <TouchableOpacity style={styles.settingsItem}>
+      <TouchableOpacity style={styles.settingsItem} onPress={() => navigation.navigate('ResetPassword')}>
         <Text style={styles.settingsText}>Change Password</Text>
       </TouchableOpacity>
       <TouchableOpacity style={styles.settingsItem} onPress={() => { navigation.navigate('Login'); setShowSettings(!showSettings) }}>
@@ -123,7 +147,7 @@ function Home({ navigation }) {
         </TouchableOpacity>
         <View style={styles.topBarIcons}>
 
-          <TouchableOpacity style={styles.iconButton}>
+          <TouchableOpacity style={styles.iconButton} onPress={() => navigation.navigate('Notifications')}>
             <View style={styles.tipIconContainer}>
               <Icon name="notifications-outline" size={24} color="#333" />
             </View>
@@ -185,7 +209,7 @@ function Home({ navigation }) {
             <Text style={styles.tipText}>
               {sugar.level > 120
                 ? 'Your Sugar Level Is above Normal Levels!'
-                : 'Drinking at least 1.5 to 2 liters of water a day helps flush toxins from your body'}
+                : tips[tipIndex]}
             </Text>
           </View>
         )}

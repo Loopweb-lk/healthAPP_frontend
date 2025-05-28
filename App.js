@@ -12,6 +12,7 @@ import Login from './screens/Login';
 import Register from './screens/Register';
 import { EditProfile, Meals } from './screens';
 import ResetPassword from './screens/Resetpassword';
+import ResetpasswordLogin from './screens/ResetpasswordLogin';
 import EmergencyContacts from './screens/EmergencyContacts';
 import MealPlanner from './screens/MealPlanner';
 import EnterMealItems from './screens/EnterMealItems';
@@ -97,6 +98,7 @@ export default function App() {
             <Stack.Screen name="BottomTabNavigation" component={BottomTabNav} />
             <Stack.Screen name="Register" component={Register} />
             <Stack.Screen name="ResetPassword" component={ResetPassword} />
+            <Stack.Screen name="ResetpasswordLogin" component={ResetpasswordLogin} />
             <Stack.Screen name="EmergencyContacts" component={EmergencyContacts} />
             <Stack.Screen name="MealPlanner" component={MealPlanner} />
             <Stack.Screen name="Meals" component={Meals} />

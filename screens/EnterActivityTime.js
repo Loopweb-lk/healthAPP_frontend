@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
+import { View, Text, StyleSheet, TouchableOpacity, Alert } from 'react-native';
 import { Calendar } from 'react-native-calendars';
 import { Picker } from '@react-native-picker/picker';
 import { SafeAreaView } from 'react-native-safe-area-context';
@@ -102,7 +102,15 @@ function EnterActivityTime({ route, navigation }) {
           }}
           style={styles.calendar}
           onDayPress={(day) => {
-            setSelectedDate(day.dateString);
+            const selectedDate = new Date(day.dateString);
+            const today = new Date();
+            today.setHours(0, 0, 0, 0);
+
+            if (selectedDate > today) {
+              Alert.alert('Invalid Date', 'Selected date is a future date.');
+            } else {
+              setSelectedDate(day.dateString);
+            }
           }}
         />
       </View>

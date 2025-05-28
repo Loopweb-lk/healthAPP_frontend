@@ -6,37 +6,42 @@ import {
     TouchableOpacity,
     TextInput,
     ScrollView,
-    Image
+    Image,
+    Keyboard,
+    TouchableWithoutFeedback
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
+import ApiServer from './../Services/ApiServer';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 function AddNewMeal({ navigation }) {
     const [itemName, setItemName] = useState('');
     const [calorieLevel, setCalorieLevel] = useState('');
-    const [quantity, setQuantity] = useState('');
-    const [selectedIcons, setSelectedIcons] = useState([]);
 
-    const foodIcons = [
-        { id: 1, name: 'Bullseye', count: 1 },
-        { id: 2, name: 'Rice Bowl', count: 1 },
-        { id: 3, name: 'Ice Cream', count: 1 },
-        { id: 4, name: 'Salad', count: 1 },
-        { id: 5, name: 'Sandwich', count: 1 },
-        { id: 6, name: 'Ice Cream', count: 1 },
-        { id: 7, name: '', count: 0 },
-        { id: 8, name: '', count: 0 },
-        { id: 9, name: '', count: 0 },
-    ];
+    const handleSave = async () => {
 
-    const handleNext = () => {
-        console.log('Next pressed with:', {
-            itemName,
-            calorieLevel,
-            quantity,
-            selectedIcons,
-        });
-        // navigation.navigate('NextScreen', { itemDetails: { itemName, calorieLevel, quantity, selectedIcons } });
+        const endpoint = '/api/meal/createFoodItems';
+
+        const body = {
+            name: itemName,
+            calorie: calorieLevel,
+        };
+
+        const token = await AsyncStorage.getItem('token');
+        const headers = {
+            Authorization: `Bearer ${token}`
+        }
+
+        ApiServer.call(endpoint, 'POST', body, headers)
+            .then(data => {
+                if (data.message == "Meal Item created successfully") {
+                    navigation.navigate('Add_New_Meal_ltem')
+                }
+            })
+            .catch(error => {
+                console.error('Register failed:', error);
+            });
     };
 
     return (
@@ -47,83 +52,34 @@ function AddNewMeal({ navigation }) {
                     onPress={() => navigation.goBack()}>
                     <Ionicons name="chevron-back" size={24} color="black" />
                 </TouchableOpacity>
-                <Text style={styles.headerTitle}>Add New Meal</Text>
+                <Text style={styles.headerTitle}>Add New Meal Item</Text>
             </View>
 
-            <View style={styles.formContainer}>
-                <Text style={styles.label}>Item Name</Text>
-                <TextInput
-                    style={styles.input}
-                    value={itemName}
-                    onChangeText={setItemName}
-                    placeholder=""
-                />
+            <TouchableWithoutFeedback onPress={Keyboard.dismiss} accessible={false}>
+                <View style={styles.formContainer}>
+                    <Text style={styles.label}>Item Name</Text>
+                    <TextInput
+                        style={styles.input}
+                        value={itemName}
+                        onChangeText={setItemName}
+                        placeholder=""
+                    />
 
-                <Text style={styles.label}>Estimated Calory Level</Text>
-                <TextInput
-                    style={styles.input}
-                    value={calorieLevel}
-                    onChangeText={setCalorieLevel}
-                    placeholder=""
-                    keyboardType="numeric"
-                />
-
-                <Text style={styles.label}>Quantity</Text>
-                <TextInput
-                    style={styles.input}
-                    value={quantity}
-                    onChangeText={setQuantity}
-                    placeholder=""
-                    keyboardType="numeric"
-                />
-
-                <Text style={styles.label}>Choose Icon</Text>
-                <View style={styles.searchContainer}>
-                    <View style={styles.searchBar}>
-                        <Ionicons name="search" size={20} color="#999" style={styles.searchIcon} />
-                        <TextInput
-                            style={styles.searchInput}
-                            placeholder="Search"
-                        />
-                    </View>
-                    <TouchableOpacity style={styles.addButton}>
-                        <Text style={styles.addButtonText}>+</Text>
-                    </TouchableOpacity>
+                    <Text style={styles.label}>calorie </Text>
+                    <TextInput
+                        style={styles.input}
+                        value={calorieLevel}
+                        onChangeText={setCalorieLevel}
+                        placeholder=""
+                        keyboardType="numeric"
+                    />
                 </View>
+            </TouchableWithoutFeedback>
 
-                <ScrollView style={styles.formContainer2}>
-                    <View style={styles.iconsGrid}>
-                        {foodIcons.map((icon) => (
-                            <TouchableOpacity
-                                key={icon.id}
-                                style={[
-                                    styles.iconBox,
-                                    selectedIcons.includes(icon.id) && styles.selectedIconBox,
-                                    icon.name === '' && styles.emptyIconBox
-                                ]}
-                                onPress={() => {
-                                    if (icon.name === '') return;
-                                    setSelectedIcons((prevSelected) =>
-                                        prevSelected.includes(icon.id)
-                                            ? prevSelected.filter((id) => id !== icon.id)
-                                            : [...prevSelected, icon.id]
-                                    );
-                                }}
-                                disabled={icon.name === ''}
-                            >
-                                {icon.name !== '' && (
-                                    <Text style={styles.iconText}>{icon.name} x {icon.count}</Text>
-                                )}
-                            </TouchableOpacity>
-                        ))}
-                    </View>
-                </ScrollView>
-            </View>
-
-            <TouchableOpacity style={styles.nextButton} onPress={handleNext}>
+            <TouchableOpacity style={styles.nextButton} onPress={handleSave}>
                 <Text style={styles.nextButtonText}>Next</Text>
             </TouchableOpacity>
-        </SafeAreaView>
+        </SafeAreaView >
     );
 }
 
@@ -241,7 +197,7 @@ const styles = StyleSheet.create({
     },
     nextButton: {
         position: 'absolute',
-        bottom: 20,
+        bottom: 40,
         left: 20,
         right: 20,
         backgroundColor: '#3177CA',

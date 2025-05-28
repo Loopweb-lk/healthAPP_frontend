@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   View,
   Text,
@@ -10,35 +10,72 @@ import {
 } from 'react-native';
 import { createStackNavigator } from '@react-navigation/stack';
 import { NavigationContainer } from '@react-navigation/native';
-import { createStaticNavigation, useNavigation,} from '@react-navigation/native';
+import { createStaticNavigation, useNavigation, } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
+import ApiServer from './../Services/ApiServer';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 function EmergencyContacts({ navigation }) {
   const [isModalVisible, setIsModalVisible] = useState(false);
+  const [contacts, setcontacts] = useState([]);
   const [newContact, setNewContact] = useState({
     name: '',
     phone: '',
   });
 
-  const contacts = [
-    { id: '3', name: 'Friend 3', phone: '123-456-7890' },
-    { id: '1', name: 'Friend 1', phone: '123-456-7890' },
-  ];
+  useEffect(() => {
+    getContacts();
+  }, []);
+
+  const getContacts = async () => {
+
+    try {
+      const endpoint = '/api/general/getContacts';
+      const token = await AsyncStorage.getItem('token');
+      const headers = {
+        Authorization: `Bearer ${token}`
+      }
+      const data = await ApiServer.call(endpoint, 'GET', null, headers);
+      setcontacts(data.contacts)
+
+    } catch (error) {
+      console.error('request failed', error.message);
+    }
+  };
 
   const handleCreateNew = () => {
     setIsModalVisible(true);
   };
 
-  const handleSave = () => {
-    // Handle saving the new contact
-    console.log('Saving contact:', newContact);
+  const handleSave = async () => {
+
+    const endpoint = '/api/general/createContact';
+
+    const body = {
+      name: newContact.name,
+      number: newContact.phone,
+    };
+
+    const token = await AsyncStorage.getItem('token');
+    const headers = {
+      Authorization: `Bearer ${token}`
+    }
+
+    ApiServer.call(endpoint, 'POST', body, headers)
+      .then(data => {
+        if (data.message == "Contact created successfully") {
+          getContacts();
+        }
+      })
+      .catch(error => {
+        console.error('failed:', error);
+      });
     setIsModalVisible(false);
     setNewContact({ name: '', phone: '' });
   };
 
   const handleFinish = () => {
-    // Handle finish action
-    console.log('Finish');
+    navigation.navigate('BottomTabNavigation');
   };
 
   return (
@@ -56,7 +93,7 @@ function EmergencyContacts({ navigation }) {
             onPress={() => console.log(`Edit contact ${contact.id}`)}
           >
             <Text style={styles.contactName}>{contact.name}</Text>
-            <Text style={styles.contactPhone}>{contact.phone}</Text>
+            <Text style={styles.contactPhone}>{contact.number}</Text>
           </TouchableOpacity>
         ))}
 
@@ -85,7 +122,7 @@ function EmergencyContacts({ navigation }) {
           <View style={styles.modalOverlay}>
             <View style={styles.modalContent}>
               <Text style={styles.modalHeader}>New Contact</Text>
-              
+
               <View style={styles.inputContainer}>
                 <Text style={styles.inputLabel}>Name</Text>
                 <TextInput

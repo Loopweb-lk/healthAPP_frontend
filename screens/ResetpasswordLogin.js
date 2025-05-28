@@ -11,34 +11,15 @@ import { Ionicons } from '@expo/vector-icons'; // Make sure to install expo icon
 import { NavigationContainer } from '@react-navigation/native';
 import { createStaticNavigation, useNavigation, } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
-import ApiServer from './../Services/ApiServer';
+import ApiServer from '../Services/ApiServer';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
-function ResetPassword({ navigation }) {
+function ResetpasswordLogin({ navigation }) {
     const [accessCode, setAccessCode] = useState('');
     const [newPassword, setNewPassword] = useState('');
     const [confirmPassword, setConfirmPassword] = useState('');
     const [showNewPassword, setShowNewPassword] = useState(false);
     const [showConfirmPassword, setShowConfirmPassword] = useState(false);
-
-    useEffect(() => {
-        const requestPassword = async () => {
-
-            try {
-                const endpoint = '/api/general/getPasswordReset';
-                const token = await AsyncStorage.getItem('token');
-                const headers = {
-                    Authorization: `Bearer ${token}`
-                }
-                const data = await ApiServer.call(endpoint, 'GET', null, headers);
-
-            } catch (error) {
-                console.error('request failed', error.message);
-            }
-        };
-
-        requestPassword();
-    }, []);
 
     const handleReset = async () => {
         const endpoint = '/api/auth/password-rest';
@@ -48,15 +29,10 @@ function ResetPassword({ navigation }) {
             token: accessCode,
         };
 
-        const token = await AsyncStorage.getItem('token');
-        const headers = {
-            Authorization: `Bearer ${token}`
-        }
-
-        ApiServer.call(endpoint, 'POST', body, headers)
+        ApiServer.call(endpoint, 'POST', body)
             .then(data => {
                 if (data.message == "Reset successful") {
-                    navigation.navigate('BottomTabNavigation')
+                    navigation.navigate('Login')
                 }
             })
             .catch(error => {
@@ -204,4 +180,4 @@ const styles = StyleSheet.create({
     },
 });
 
-export default ResetPassword;
+export default ResetpasswordLogin;
